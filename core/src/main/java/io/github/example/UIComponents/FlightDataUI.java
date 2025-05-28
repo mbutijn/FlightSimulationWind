@@ -69,7 +69,11 @@ public abstract class FlightDataUI {
     }
 
     public static String formatTwoDecimals(float value){
-        String out = "" + (Math.round(100 * value) / 100f);
+        float numberTimesHundred = Math.round(100 * value);
+        String out = "" + numberTimesHundred / 100f;
+        if (numberTimesHundred % 10 == 0){
+            out = out + "0";
+        }
         return out.contains(".") ? out : out + ".0";
     }
 

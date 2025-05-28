@@ -68,7 +68,7 @@ public class FlightSimulation extends ApplicationAdapter implements InputProcess
         steeringModeDataUI = new SteeringModeDataUI(aircraft, uiViewport, shape, batch, 0.5f * uiViewport.getWorldWidth() - 100f, 0.75f * uiViewport.getWorldHeight());
         AirPropertiesDataUI airPropertiesDataUI = new AirPropertiesDataUI(aircraft, uiViewport, shape, batch, uiViewport.getWorldWidth() - 120, uiViewport.getWorldHeight() - 50);
         airPropertiesDataUI.setAir(air);
-        autoPilotModeDataUI = new AutoPilotModeDataUI(aircraft, uiViewport, shape, batch, uiViewport.getWorldWidth() - 100, 150);
+        autoPilotModeDataUI = new AutoPilotModeDataUI(aircraft, uiViewport, shape, batch, uiViewport.getWorldWidth() - 100, 110);
 
         worldCamera.setToOrtho(false);
         worldCamera.position.set(worldCamera.viewportWidth / 2, worldCamera.viewportHeight / 2, 0);
@@ -220,13 +220,15 @@ public class FlightSimulation extends ApplicationAdapter implements InputProcess
                 if (autoPilotModeDataUI.mouseAboveUI(screenX, y)){
                     autoPilot.setMode(AutoPilotMode.VERTICAL_SPEED);
                     autoPilot.toggleClimbAndHold();
+                    autoPilot.verticalSpeedController.resetErrorIntegral();
                 } else if (pitchAngleDataUI.mouseAboveUI(screenX, y)){
                     autoPilot.setMode(AutoPilotMode.PITCH_HOLD);
+                    autoPilot.pitchController.resetErrorIntegral();
                 } else if (climbRateDataUI.mouseAboveUI(screenX + climbRateDataUI.getRadius(), y + climbRateDataUI.getRadius())) {
                     autoPilot.setMode(AutoPilotMode.VERTICAL_SPEED);
+                    autoPilot.verticalSpeedController.resetErrorIntegral();
                     autoPilot.setClimbAndHold(false);
                 } else if (velocityTape.mouseAboveUI(screenX, screenY)) {
-//                    autoPilot.setErrorIntegral(0);
                     autoPilot.toggleAutoThrottle();
                 } else {
                     steeringMode = SteeringMode.NONE;
@@ -275,12 +277,17 @@ public class FlightSimulation extends ApplicationAdapter implements InputProcess
             } else if (climbRateDataUI.mouseAboveUI(xMouse + climbRateDataUI.getRadius(),
                     uiViewport.getWorldHeight() - yMouse + climbRateDataUI.getRadius())) {
                 autoPilot.setMode(AutoPilotMode.VERTICAL_SPEED);
-                autoPilot.changeSetClimbRate(amountY);
+                autoPilot.changeSetClimbRate(amountY, true);
             } else if (altitudeTape.mouseAboveUI(xMouse, yMouse)) {
-                autoPilot.changeSetAltitude(amountY);
+                autoPilot.changeSetAltitude(amountY, true);
                 autoPilot.setMode(AutoPilotMode.ALTITUDE_HOLD);
             } else if (autoPilotModeDataUI.mouseAboveUI(xMouse, uiViewport.getWorldHeight() - yMouse)) {
-                autoPilot.changeSetAltitude(amountY);
+                boolean coarseTuning = autoPilotModeDataUI.mouseAboveLeftButton(xMouse);
+                if (autoPilot.isClimbAndHold()){
+                    autoPilot.changeSetAltitude(amountY, coarseTuning);
+                } else {
+                    autoPilot.changeSetClimbRate(amountY, coarseTuning);
+                }
             } else if (velocityTape.mouseAboveUI(xMouse, yMouse)) {
                 autoPilot.changeSetAirspeed(amountY);
             } else {
@@ -294,8 +301,7 @@ public class FlightSimulation extends ApplicationAdapter implements InputProcess
 
     public void zoom(float amount){
         worldCamera.zoom += amount * worldCamera.zoom * 0.1f;
-//        worldCamera.zoom = Math.max(0.1f, Math.min(worldCamera.zoom, 2.0f)); // Clamp the zoom level
-        worldCamera.zoom = Math.max(0.01f, worldCamera.zoom);
+        worldCamera.zoom = Math.max(0.01f, Math.min(worldCamera.zoom, 10.0f)); // Clamp the zoom level
     }
 
     @Override

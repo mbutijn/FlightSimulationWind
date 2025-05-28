@@ -10,7 +10,7 @@ public class AutoPilot {
     private float setAirspeed;
     private AutoPilotMode mode;
     private boolean autoThrottle;
-    public boolean climbAndHold;
+    private boolean climbAndHold;
     public PIDController pitchController, verticalSpeedController, altitudeController;
 
     public AutoPilot (Aircraft aircraft){
@@ -92,16 +92,16 @@ public class AutoPilot {
         return Math.min(throttle, maxValue);
     }
 
-    public void changeSetClimbRate(float amount) {
-        setClimbRate -= (100 * amount / UnitConversionUtils.getMps2Feetpmin());
+    public void changeSetClimbRate(float amount, boolean coarseTuning) {
+        setClimbRate -= ((coarseTuning ? 100 : 10) * amount / UnitConversionUtils.getMps2Feetpmin());
     }
 
     public float getSetClimbRate(){
         return setClimbRate;
     }
 
-    public void changeSetAltitude(float amount) {
-        setAltitude -= 100 * amount / UnitConversionUtils.getM2Feet();
+    public void changeSetAltitude(float amount, boolean coarseTuning) {
+        setAltitude -= (coarseTuning ? 100 : 10) * amount / UnitConversionUtils.getM2Feet();
     }
 
     public void setSetAltitude(float setAltitude) {
@@ -144,5 +144,9 @@ public class AutoPilot {
 
     public boolean getAutoThrottle() {
         return autoThrottle;
+    }
+
+    public boolean isClimbAndHold() {
+        return climbAndHold;
     }
 }

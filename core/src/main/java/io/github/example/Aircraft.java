@@ -36,7 +36,6 @@ public class Aircraft {
         this.reset();
 
         this.sprite = new Sprite(new Texture("aircraft.png"));
-        System.out.println(Gdx.files.internal("assets/aircraft.png").exists());
 
         sprite.setSize(10, 10);
         sprite.setOrigin(0.6f * sprite.getWidth(), 0.5f * sprite.getHeight());
@@ -173,6 +172,12 @@ public class Aircraft {
         this.pitchAngle = 0; // -15
         this.pitchRate = 0; // 0
         this.pitchAcceleration = 0; // 0
+
+        if (this.autoPilot != null) {
+            autoPilot.pitchController.resetErrorIntegral();
+            autoPilot.altitudeController.resetErrorIntegral();
+            autoPilot.verticalSpeedController.resetErrorIntegral();
+        }
     }
 
     public Vector2 getPosition(){
