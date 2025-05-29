@@ -30,6 +30,7 @@ public class FlightSimulation extends ApplicationAdapter implements InputProcess
     private DataTape altitudeTape, velocityTape;
     private PitchAngleDataUI pitchAngleDataUI;
     private AngleOfAttackDataUI angleOfAttackDataUI;
+    private ThrottleDataUI throttleDataUI;
     private ClimbRateDataUI climbRateDataUI;
     private SteeringModeDataUI steeringModeDataUI;
     private AutoPilotModeDataUI autoPilotModeDataUI;
@@ -57,18 +58,18 @@ public class FlightSimulation extends ApplicationAdapter implements InputProcess
         batch = new SpriteBatch();
         altitudeTape = new DataTape(aircraft, uiViewport, shape, batch, uiViewport.getWorldWidth() - 110, 0.5f * uiViewport.getWorldHeight() - 150);
         altitudeTape.setProperties(60, 2f, 10);
-        climbRateDataUI = new ClimbRateDataUI(aircraft, uiViewport, shape, batch, uiViewport.getWorldWidth() - 200, 85);
+        climbRateDataUI = new ClimbRateDataUI(aircraft, uiViewport, shape, batch, uiViewport.getWorldWidth() - 220, 85);
         velocityTape = new DataTape(aircraft, uiViewport, shape, batch, 0, 0.5f * uiViewport.getWorldHeight() - 150);
         velocityTape.setProperties(20, 6f, 10);
         pitchAngleDataUI = new PitchAngleDataUI(aircraft,  uiViewport, shape, batch, 0.5f * uiViewport.getWorldWidth() - 37.5f, 0);
-        ThrottleDataUI throttleDataUI = new ThrottleDataUI(aircraft, uiViewport, shape, batch, uiViewport.getWorldWidth() - 340, 85);
+        throttleDataUI = new ThrottleDataUI(aircraft, uiViewport, shape, batch, uiViewport.getWorldWidth() - 380, 85);
         angleOfAttackDataUI = new AngleOfAttackDataUI(aircraft, uiViewport, shape, batch, 100, 75);
         ElevatorDataUI elevatorDataUI = new ElevatorDataUI(aircraft, uiViewport, shape, batch, 300, 75);
         SpeedDataUI speedDataUI = new SpeedDataUI(aircraft, uiViewport, shape, batch, 20, 0.5f * uiViewport.getWorldHeight() - 160);
         steeringModeDataUI = new SteeringModeDataUI(aircraft, uiViewport, shape, batch, 0.5f * uiViewport.getWorldWidth() - 100f, 0.75f * uiViewport.getWorldHeight());
         AirPropertiesDataUI airPropertiesDataUI = new AirPropertiesDataUI(aircraft, uiViewport, shape, batch, uiViewport.getWorldWidth() - 120, uiViewport.getWorldHeight() - 50);
         airPropertiesDataUI.setAir(air);
-        autoPilotModeDataUI = new AutoPilotModeDataUI(aircraft, uiViewport, shape, batch, uiViewport.getWorldWidth() - 100, 110);
+        autoPilotModeDataUI = new AutoPilotModeDataUI(aircraft, uiViewport, shape, batch, uiViewport.getWorldWidth() - 100, 10);
 
         worldCamera.setToOrtho(false);
         worldCamera.position.set(worldCamera.viewportWidth / 2, worldCamera.viewportHeight / 2, 0);
@@ -228,7 +229,7 @@ public class FlightSimulation extends ApplicationAdapter implements InputProcess
                     autoPilot.setMode(AutoPilotMode.VERTICAL_SPEED);
                     autoPilot.verticalSpeedController.resetErrorIntegral();
                     autoPilot.setClimbAndHold(false);
-                } else if (velocityTape.mouseAboveUI(screenX, screenY)) {
+                } else if (velocityTape.mouseAboveUI(screenX, screenY) || throttleDataUI.mouseAboveUI(screenX + throttleDataUI.getRadius(), y + throttleDataUI.getRadius())) {
                     autoPilot.toggleAutoThrottle();
                 } else {
                     steeringMode = SteeringMode.NONE;
@@ -282,7 +283,7 @@ public class FlightSimulation extends ApplicationAdapter implements InputProcess
                 autoPilot.changeSetAltitude(amountY, true);
                 autoPilot.setMode(AutoPilotMode.ALTITUDE_HOLD);
             } else if (autoPilotModeDataUI.mouseAboveUI(xMouse, uiViewport.getWorldHeight() - yMouse)) {
-                boolean coarseTuning = autoPilotModeDataUI.mouseAboveLeftButton(xMouse);
+                boolean coarseTuning = autoPilotModeDataUI.mouseAboveCourseButton(uiViewport.getWorldHeight() - yMouse);
                 if (autoPilot.isClimbAndHold()){
                     autoPilot.changeSetAltitude(amountY, coarseTuning);
                 } else {

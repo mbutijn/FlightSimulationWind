@@ -20,7 +20,7 @@ public class ClimbRateDataUI extends FlightDataUI {
     }
 
     public void writeValues(){
-        font.draw(batch, "Climb rate: " + (Math.round(aircraft.getClimbRate() * UnitConversionUtils.getMps2Feetpmin())) + " feet/min", x - 60, y - 50);
+        font.draw(batch, "Climb rate: " + (Math.round(aircraft.getClimbRate() * UnitConversionUtils.getMps2Feetpmin())) + " feet/min", x - 80, y - 50);
         font.draw(batch, "up", x - radius + 4, y + 17);
         font.draw(batch, "down", x - radius + 4, y - 5);
     }

@@ -6,8 +6,13 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import io.github.example.*;
 
 public class ThrottleDataUI extends FlightDataUI {
+    private final float radius;
+
     public ThrottleDataUI(Aircraft aircraft, Viewport viewport, ShapeRenderer shape, SpriteBatch batch, float x, float y){
         super(aircraft, viewport, shape, batch, x, y);
+        this.radius = 40;
+        this.width = 2 * radius;
+        this.height = 2 * radius;
     }
 
     public void writeValues(){
@@ -22,11 +27,14 @@ public class ThrottleDataUI extends FlightDataUI {
     }
 
     public void draw() {
-        float radius = 40;
         float angle = 2.7f * aircraft.getThrottle();
         float x_tip = (float) (x + radius * Math.cos(Math.toRadians(225 - angle)));
         float y_tip = (float) (y + radius * Math.sin(Math.toRadians(225 - angle)));
         shape.rectLine(x, y, x_tip, y_tip, 0.1f); // moving
         shape.arc(x, y, radius, -45, 270); // static
+    }
+
+    public float getRadius() {
+        return radius;
     }
 }
