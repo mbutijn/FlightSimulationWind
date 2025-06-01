@@ -1,6 +1,7 @@
 package io.github.example;
 
-import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Polygon;
 import io.github.example.UIComponents.ElevatorDataUI;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -17,6 +18,7 @@ public class Aircraft {
     private final AutoPilot autoPilot;
     private final Air air;
     private final Sprite sprite;
+    private final Polygon hitBox;
     private int throttle;
     private ChangeThrottle changeThrottle;
 //    private boolean noseUp;
@@ -26,38 +28,40 @@ public class Aircraft {
         this.mass = mass;
         this.momentOfInertia = 2100; // kg * m^4
         this.weight = new Vector2(0, -9.807f * mass); // Weight => 9807 N
-//        this.time = System.currentTimeMillis();
-
-        // disturbance
         this.wind = new Vector2(-20, 0); // -20, 0
-
         this.thrust = new Vector2(0, 0);
         this.changeThrottle = ChangeThrottle.NONE;
+        this.wingArea = 16.2f; // wing surface area [m²]
+        this.air = air;
         this.reset();
+        this.autoPilot = new AutoPilot(this);
 
         this.sprite = new Sprite(new Texture("aircraft.png"));
-
         sprite.setSize(10, 10);
         sprite.setOrigin(0.6f * sprite.getWidth(), 0.5f * sprite.getHeight());
+        hitBox = new Polygon(new float[]{
+            1.1f, 4.8f, // bottom tail (left)
+            0.9f, 6.8f, // tail top (left)
+            5.0f, 6.8f, // top
+            9.5f, 5.0f, // front (right)
+            7.95f, 3.3f, // bottom front gear (right)
+            5.6f, 3.3f  // bottom rear gear (left)
+        });
 
         // Initialize aerodynamic coefficients
-        Cl = new AerodynamicCoefficient(new float[] {-180, -90,  -30,  -20,  -10,   8,  10,  12,  15,  18,  21,   26,   32,   60,  90, 135, 180},
-                new float[] {0, -0.07f, -0.29f, -0.79f, -0.64f, 1.36f, 1.5f, 1.5f, 1.43f, 1.0f, 0.5f, 0.21f, 0.14f, 0.05f, -0.05f, -0.2f, 0});
-        Cd = new AerodynamicCoefficient(new float[] {-180,  -90, -50, -20,   -15, -10,   -5,    0,     5,      8,     10,    12,    15,   20, 50,  90, 180},
-                new float[] {0.05f, 1.35f, 0.6f, 0.225f, 0.175f, 0.1f, 0.05f, 0.03f, 0.035f, 0.0425f, 0.0525f, 0.075f, 0.125f, 0.2f, 0.6f, 1.35f, 0.05f});
+        Cl = new AerodynamicCoefficient(new float[]{-180, -90, -30, -20, -10, 8, 10, 12, 15, 18, 21, 26, 32, 60, 90, 135, 180},
+            new float[]{0, -0.07f, -0.29f, -0.79f, -0.64f, 1.36f, 1.5f, 1.5f, 1.43f, 1.0f, 0.5f, 0.21f, 0.14f, 0.05f, -0.05f, -0.2f, 0});
+        Cd = new AerodynamicCoefficient(new float[]{-180, -90, -50, -20, -15, -10, -5, 0, 5, 8, 10, 12, 15, 20, 50, 90, 180},
+            new float[]{0.05f, 1.35f, 0.6f, 0.225f, 0.175f, 0.1f, 0.05f, 0.03f, 0.035f, 0.0425f, 0.0525f, 0.075f, 0.125f, 0.2f, 0.6f, 1.35f, 0.05f});
         Cm = new AerodynamicCoefficient(new float[]{-180, -135, -90, -60, -30, -20, -10, 0, 10, 20, 30, 60, 90, 135, 180},
-                new float[] {0, 0.15f, 0.2f, 0.18f, 0.1f, 0.06f, 0.02f, -0.05f, -0.08f, -0.1f, -0.12f, -0.18f, -0.2f, -0.15f, 0}); // approx neg sin wave
-
-        this.wingArea = 16.2f; // wing surface area [m²]
-
-        this.air = air;
-        this.autoPilot = new AutoPilot(this);
+            new float[]{0, 0.15f, 0.2f, 0.18f, 0.1f, 0.06f, 0.02f, -0.05f, -0.08f, -0.1f, -0.12f, -0.18f, -0.2f, -0.15f, 0}); // approx neg sin wave
 
         Cm_deltaE = 0.05f;
         ElevatorDataUI.setDeflection(Cm_deltaE);
 
         maxPower = 0.8f * 134225.977f; // at sea level
         powerPerThrottle = 0.01f * maxPower;
+//        this.time = System.currentTimeMillis();
     }
 
     private float integrate(float output, float integrand, float timeDelta) {
@@ -104,10 +108,23 @@ public class Aircraft {
         position.x = integrate(position.x, velocity.x, timeStep);
         position.y = integrate(position.y, velocity.y, timeStep);
 
-        if (position.y < 1) {
+        if (checkCrashed()){
             System.out.println("aircraft crashed");
             reset();
         }
+    }
+
+    public boolean checkCrashed() {
+        hitBox.setPosition(sprite.getX(), sprite.getY());
+        hitBox.setOrigin(sprite.getOriginX(), sprite.getOriginY());
+        hitBox.setRotation(sprite.getRotation());
+        float [] vertices = hitBox.getTransformedVertices();
+        for (int i = 1; i < vertices.length; i += 2){
+            if (vertices[i] < 0) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void updateAutoPilot(){
@@ -316,5 +333,9 @@ public class Aircraft {
 
     public double getFlightPathAngle() {
         return Math.toRadians(flightPathAngle);
+    }
+
+    public void renderHitBox(ShapeRenderer shape) {
+        shape.polygon(hitBox.getTransformedVertices());
     }
 }

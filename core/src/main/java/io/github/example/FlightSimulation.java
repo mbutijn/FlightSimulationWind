@@ -133,6 +133,7 @@ public class FlightSimulation extends ApplicationAdapter implements InputProcess
 
             shape.begin(ShapeRenderer.ShapeType.Line);
             shape.setProjectionMatrix(worldCamera.combined);
+            //aircraft.renderHitBox(shape);
             uiViewport.apply();
             shape.setProjectionMatrix(uiCamera.combined);
 
@@ -283,11 +284,15 @@ public class FlightSimulation extends ApplicationAdapter implements InputProcess
                 autoPilot.changeSetAltitude(amountY, true);
                 autoPilot.setMode(AutoPilotMode.ALTITUDE_HOLD);
             } else if (autoPilotModeDataUI.mouseAboveUI(xMouse, uiViewport.getWorldHeight() - yMouse)) {
-                boolean coarseTuning = autoPilotModeDataUI.mouseAboveCourseButton(uiViewport.getWorldHeight() - yMouse);
-                if (autoPilot.isClimbAndHold()){
-                    autoPilot.changeSetAltitude(amountY, coarseTuning);
+                if (autoPilot.getMode() == AutoPilotMode.PITCH_HOLD){
+                    autoPilot.changeSetPitchAngle(amountY);
                 } else {
-                    autoPilot.changeSetClimbRate(amountY, coarseTuning);
+                    boolean coarseTuning = autoPilotModeDataUI.mouseAboveCourseButton(uiViewport.getWorldHeight() - yMouse);
+                    if (autoPilot.isClimbAndHold()) {
+                        autoPilot.changeSetAltitude(amountY, coarseTuning);
+                    } else {
+                        autoPilot.changeSetClimbRate(amountY, coarseTuning);
+                    }
                 }
             } else if (velocityTape.mouseAboveUI(xMouse, yMouse)) {
                 autoPilot.changeSetAirspeed(amountY);
