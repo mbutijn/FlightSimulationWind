@@ -21,9 +21,9 @@ public class AutoPilot {
         this.setAltitude = aircraft.getPosition().y;
         this.setAirspeed = aircraft.getTrueAirspeed();
         this.climbAndHold = false;
-        this.pitchController = new PIDController(1, 0.005f, -0.3f);
-        this.verticalSpeedController = new PIDController(0.1f, 0.001f, -0.2f);
-        this.altitudeController = new PIDController(0.1f, 0.05f, -0.2f);
+        this.pitchController = new PIDController(1, 0.005f, -0.3f, -1, 1);
+        this.verticalSpeedController = new PIDController(0.1f, 0.001f, -0.2f, -1, 1);
+        this.altitudeController = new PIDController(0.2f, 0.0f, -0.05f, -4, 4);
     }
 
     public void calculateElevatorDeflection(){
@@ -40,8 +40,10 @@ public class AutoPilot {
                 aircraft.getAutoPilot().setMode(AutoPilotMode.ALTITUDE_HOLD);
             }
         } else if (mode == AutoPilotMode.ALTITUDE_HOLD) {
-            altitudeController.updateValues(0, aircraft.getClimbRate(), aircraft.getAcceleration().y, setAltitude - altitude);
-            Cm_deltaE = altitudeController.calculateOutput();
+            altitudeController.updateValues(setAltitude, aircraft.getPosition().y, aircraft.getClimbRate());
+            float setClimb = altitudeController.calculateOutput();
+            verticalSpeedController.updateValues(setClimb, aircraft.getClimbRate(), aircraft.getAcceleration().y);
+            Cm_deltaE = verticalSpeedController.calculateOutput();
 
             if (Math.abs(setAltitude - altitude) > 20){
                 climbAndHold = true;

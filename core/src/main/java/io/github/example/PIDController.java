@@ -7,12 +7,12 @@ public class PIDController {
     private float errorIntegral;
     private float errorDot;
 
-    public PIDController(float P, float I, float D){
+    public PIDController(float P, float I, float D, float min, float max){
         this.P = P;
         this.I = I;
         this.D = D;
-        this.minValue = -1f;
-        this.maxValue = 1f;
+        this.minValue = min;
+        this.maxValue = max;
     }
 
     public void updateValues(float setValue, float realValue, float errorDot, float errorIntegral){

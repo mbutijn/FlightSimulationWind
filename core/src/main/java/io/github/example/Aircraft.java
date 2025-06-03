@@ -31,7 +31,7 @@ public class Aircraft {
         this.wind = new Vector2(-20, 0); // -20, 0
         this.thrust = new Vector2(0, 0);
         this.changeThrottle = ChangeThrottle.NONE;
-        this.wingArea = 16.2f; // wing surface area [m²]
+        this.wingArea = 16.17f; // wing surface area [m²]
         this.air = air;
         this.reset();
         this.autoPilot = new AutoPilot(this);
@@ -49,10 +49,10 @@ public class Aircraft {
         });
 
         // Initialize aerodynamic coefficients
-        Cl = new AerodynamicCoefficient(new float[]{-180, -90, -30, -20, -10, 8, 10, 12, 15, 18, 21, 26, 32, 60, 90, 135, 180},
-            new float[]{0, -0.07f, -0.29f, -0.79f, -0.64f, 1.36f, 1.5f, 1.5f, 1.43f, 1.0f, 0.5f, 0.21f, 0.14f, 0.05f, -0.05f, -0.2f, 0});
+        Cl = new AerodynamicCoefficient(new float[]{-180, -90, -30, -20, -10, 0, 8, 10, 12, 15, 18, 21, 26, 32, 60, 90, 135, 180},
+            new float[]{0, -0.07f, -0.29f, -0.79f, -0.64f, 0.2f, 1.3f, 1.4f, 1.45f, 1.4f, 1.1f, 0.6f, 0.3f, 0.15f, 0.05f, -0.05f, -0.2f, 0});
         Cd = new AerodynamicCoefficient(new float[]{-180, -90, -50, -20, -15, -10, -5, 0, 5, 8, 10, 12, 15, 20, 50, 90, 180},
-            new float[]{0.05f, 1.35f, 0.6f, 0.225f, 0.175f, 0.1f, 0.05f, 0.03f, 0.035f, 0.0425f, 0.0525f, 0.075f, 0.125f, 0.2f, 0.6f, 1.35f, 0.05f});
+            new float[]{0.05f, 1.35f, 0.6f,  0.22f,  0.16f, 0.08f, 0.045f, 0.02f, 0.025f, 0.032f, 0.045f, 0.07f, 0.12f,  0.22f, 0.6f, 1.35f, 0.05f});
         Cm = new AerodynamicCoefficient(new float[]{-180, -135, -90, -60, -30, -20, -10, 0, 10, 20, 30, 60, 90, 135, 180},
             new float[]{0, 0.15f, 0.2f, 0.18f, 0.1f, 0.06f, 0.02f, -0.05f, -0.08f, -0.1f, -0.12f, -0.18f, -0.2f, -0.15f, 0}); // approx neg sin wave
 
@@ -176,7 +176,7 @@ public class Aircraft {
     public void reset() {
         System.out.println("reset");
 
-        this.position = new Vector2(0, 4267.2f); // 0, 2500 (service ceiling = 4267.2f)
+        this.position = new Vector2(0, 2133.6f); // 0, 2500 (service ceiling = 4267.2f)
         this.velocity = new Vector2(55, 0); // 55, 0
         this.acceleration = new Vector2(0, 0);
         this.throttle = 75; // 75

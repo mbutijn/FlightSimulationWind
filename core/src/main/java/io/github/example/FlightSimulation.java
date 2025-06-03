@@ -53,7 +53,7 @@ public class FlightSimulation extends ApplicationAdapter implements InputProcess
     @Override
     public void create() {
         shape = new ShapeRenderer();
-        aircraft = new Aircraft(1000, air);
+        aircraft = new Aircraft(1157, air);
 
         batch = new SpriteBatch();
         altitudeTape = new DataTape(aircraft, uiViewport, shape, batch, uiViewport.getWorldWidth() - 110, 0.5f * uiViewport.getWorldHeight() - 150);
@@ -294,7 +294,9 @@ public class FlightSimulation extends ApplicationAdapter implements InputProcess
                         autoPilot.changeSetClimbRate(amountY, coarseTuning);
                     }
                 }
-            } else if (velocityTape.mouseAboveUI(xMouse, yMouse)) {
+            } else if (autoPilot.getAutoThrottle() && (velocityTape.mouseAboveUI(xMouse, yMouse) ||
+                throttleDataUI.mouseAboveUI(xMouse + throttleDataUI.getRadius(),
+                uiViewport.getWorldHeight() - yMouse + throttleDataUI.getRadius()))) {
                 autoPilot.changeSetAirspeed(amountY);
             } else {
                 zoom(amountY);
