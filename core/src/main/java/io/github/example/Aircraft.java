@@ -22,6 +22,7 @@ public class Aircraft {
     private int throttle;
     private ChangeThrottle changeThrottle;
     private final Gear gear;
+    private final Vector2 cgPosition;
 //    private boolean noseUp;
 //    private long time;
 
@@ -34,13 +35,10 @@ public class Aircraft {
         this.changeThrottle = ChangeThrottle.NONE;
         this.wingArea = 16.17f; // wing surface area [m²]
         this.air = air;
-        this.gear = new Gear(this);
-        this.reset();
-        this.autoPilot = new AutoPilot(this);
-
         this.sprite = new Sprite(new Texture("aircraft.png"));
+        this.cgPosition = new Vector2(0.65f, 0.5f);
         sprite.setSize(10, 10);
-        sprite.setOrigin(0.6f * sprite.getWidth(), 0.5f * sprite.getHeight());
+        sprite.setOrigin(cgPosition.x * sprite.getWidth(), cgPosition.y * sprite.getHeight());
         hitBox = new Polygon(new float[]{
             1.1f, 4.8f, // bottom tail (left)
             0.9f, 6.8f, // tail top (left)
@@ -51,6 +49,11 @@ public class Aircraft {
             5.6f, 3.3f, // rear gear (left)
             4.9f, 4.1f // bottom rear fuselage (left)
         });
+
+        this.reset();
+        this.gear = new Gear(this);
+        this.gear.reset();
+        this.autoPilot = new AutoPilot(this);
 
         // Initialize aerodynamic coefficients
         Cl = new AerodynamicCoefficient(new float[]{-180, -90, -30, -20, -10, 0, 8, 10, 12, 15, 18, 21, 26, 32, 60, 90, 135, 180},
@@ -198,7 +201,6 @@ public class Aircraft {
         this.pitchAngle = 0; // -15
         this.pitchRate = 0; // 0
         this.pitchAcceleration = 0; // 0
-        this.gear.reset();
 
         if (this.autoPilot != null) {
             autoPilot.pitchController.resetErrorIntegral();
@@ -315,7 +317,7 @@ public class Aircraft {
     }
 
     public void render(SpriteBatch batch) {
-        sprite.setPosition(position.x - sprite.getWidth() * 0.6f, position.y - 0.5f * sprite.getHeight());
+        sprite.setPosition(position.x - sprite.getWidth() * cgPosition.x, position.y - cgPosition.y * sprite.getHeight());
         sprite.setRotation(pitchAngle);
 
         sprite.draw(batch);
@@ -360,10 +362,14 @@ public class Aircraft {
     public void renderCenterOfGravity(ShapeRenderer shape){
 //        shape.circle(position.x, position.y, 0.1f, 20);
 //        shape.circle(sprite.getOriginX(), sprite.getOriginY(), 0.1f, 20);
-        shape.circle(sprite.getX() + 0.6f * sprite.getWidth(), sprite.getY() + 0.5f * sprite.getHeight(), 0.1f, 20);
+        shape.circle(sprite.getX() + cgPosition.x * sprite.getWidth(), sprite.getY() + cgPosition.y * sprite.getHeight(), 0.1f, 20);
     }
 
     public Sprite getSprite(){
         return sprite;
+    }
+
+    public Vector2 getCgPosition(){
+        return cgPosition;
     }
 }

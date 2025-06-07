@@ -119,19 +119,16 @@ public class FlightSimulation extends ApplicationAdapter implements InputProcess
             batch.begin();
             batch.setProjectionMatrix(worldCamera.combined);
             backGround.render(batch, worldCamera, worldViewport.getScreenWidth(), worldViewport.getScreenHeight());
+            aircraft.render(batch);
+            batch.end();
 
             float deltaTime = Gdx.graphics.getDeltaTime();
+            worldCamera.update();
+            uiCamera.update();
             if (steeringMode == SteeringMode.AUTO_PILOT){
                 aircraft.updateAutoPilot();
             }
             aircraft.update(deltaTime);
-
-            aircraft.render(batch);
-            batch.end();
-
-            worldCamera.update();
-            uiCamera.update();
-
             shape.end();
 
             shape.begin(ShapeRenderer.ShapeType.Line);
