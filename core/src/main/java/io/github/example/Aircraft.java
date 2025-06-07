@@ -105,8 +105,8 @@ public class Aircraft {
         resultantForce.add(aerodynamicForce);
         resultantForce.add(weight);
         resultantForce.add(thrust);
-        resultantForce.add(gear.getNormalFront());
-        resultantForce.add(gear.getNormalRear());
+        resultantForce.add(gear.getFrontWheel().getReactionForce());
+        resultantForce.add(gear.getRearWheel().getReactionForce());
 
         acceleration.y = resultantForce.y / mass;
         acceleration.x = resultantForce.x / mass;

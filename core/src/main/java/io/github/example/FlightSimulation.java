@@ -196,7 +196,7 @@ public class FlightSimulation extends ApplicationAdapter implements InputProcess
             worldCamera.zoom = 0.1f;
         }
         if (keycode == Input.Keys.B){
-            aircraft.getGear().brake();
+            aircraft.getGear().setBrakeCommand(BrakeCommand.BRAKE);
         }
         return true;
     }
@@ -207,7 +207,7 @@ public class FlightSimulation extends ApplicationAdapter implements InputProcess
             aircraft.setChangeThrottle(ChangeThrottle.NONE);
         }
         if (keycode == Input.Keys.B){
-            aircraft.getGear().releaseBrake();
+            aircraft.getGear().setBrakeCommand(BrakeCommand.RELEASE_BRAKE);
         }
         return false;
     }

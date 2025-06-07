@@ -81,9 +81,11 @@ public class DataTape extends FlightDataUI {
     }
 
     public void drawStallRegionsWarning(float stallSpeed) {
-        float airspeed = aircraft.getTrueAirspeed() * UnitConversionUtils.getMps2Knts();
-        drawRegion(stallSpeed, airspeed, Color.YELLOW);
-        drawRegion(0.9f * stallSpeed, airspeed, Color.RED);
+        if (!aircraft.getGear().bothWheelsOnGround()) {
+            float airspeed = aircraft.getTrueAirspeed() * UnitConversionUtils.getMps2Knts();
+            drawRegion(stallSpeed, airspeed, Color.YELLOW);
+            drawRegion(0.9f * stallSpeed, airspeed, Color.RED);
+        }
     }
 
     public void drawRegion(float borderSpeed, float airspeed, Color color){
