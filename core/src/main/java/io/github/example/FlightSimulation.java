@@ -119,21 +119,25 @@ public class FlightSimulation extends ApplicationAdapter implements InputProcess
             batch.begin();
             batch.setProjectionMatrix(worldCamera.combined);
             backGround.render(batch, worldCamera, worldViewport.getScreenWidth(), worldViewport.getScreenHeight());
-            aircraft.render(batch);
-            batch.end();
 
             float deltaTime = Gdx.graphics.getDeltaTime();
-            worldCamera.update();
-            uiCamera.update();
             if (steeringMode == SteeringMode.AUTO_PILOT){
                 aircraft.updateAutoPilot();
             }
             aircraft.update(deltaTime);
+
+            aircraft.render(batch);
+            batch.end();
+
+            worldCamera.update();
+            uiCamera.update();
+
             shape.end();
 
             shape.begin(ShapeRenderer.ShapeType.Line);
             shape.setProjectionMatrix(worldCamera.combined);
-            //aircraft.renderHitBox(shape);
+            aircraft.renderHitBox(shape);
+            aircraft.renderCenterOfGravity(shape);
             uiViewport.apply();
             shape.setProjectionMatrix(uiCamera.combined);
 
@@ -194,6 +198,9 @@ public class FlightSimulation extends ApplicationAdapter implements InputProcess
         if (keycode == Input.Keys.HOME){
             worldCamera.zoom = 0.1f;
         }
+        if (keycode == Input.Keys.B){
+            aircraft.getGear().brake();
+        }
         return true;
     }
 
@@ -201,6 +208,9 @@ public class FlightSimulation extends ApplicationAdapter implements InputProcess
     public boolean keyUp(int keycode) {
         if (keycode == Input.Keys.PAGE_DOWN || keycode == Input.Keys.PAGE_UP) {
             aircraft.setChangeThrottle(ChangeThrottle.NONE);
+        }
+        if (keycode == Input.Keys.B){
+            aircraft.getGear().releaseBrake();
         }
         return false;
     }

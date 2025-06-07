@@ -21,6 +21,7 @@ public class Aircraft {
     private final Polygon hitBox;
     private int throttle;
     private ChangeThrottle changeThrottle;
+    private final Gear gear;
 //    private boolean noseUp;
 //    private long time;
 
@@ -28,11 +29,12 @@ public class Aircraft {
         this.mass = mass;
         this.momentOfInertia = 2100; // kg * m^4
         this.weight = new Vector2(0, -9.807f * mass); // Weight => 9807 N
-        this.wind = new Vector2(-20, 0); // -20, 0
+        this.wind = new Vector2(0, 0); // -20, 0
         this.thrust = new Vector2(0, 0);
         this.changeThrottle = ChangeThrottle.NONE;
         this.wingArea = 16.17f; // wing surface area [m²]
         this.air = air;
+        this.gear = new Gear(this);
         this.reset();
         this.autoPilot = new AutoPilot(this);
 
@@ -42,10 +44,12 @@ public class Aircraft {
         hitBox = new Polygon(new float[]{
             1.1f, 4.8f, // bottom tail (left)
             0.9f, 6.8f, // tail top (left)
-            5.0f, 6.8f, // top
+            4.3f, 6.8f, // top
             9.5f, 5.0f, // front (right)
-            7.95f, 3.3f, // bottom front gear (right)
-            5.6f, 3.3f  // bottom rear gear (left)
+            8.2f, 4.1f, // bottom front fuselage (right)
+            8.0f, 3.3f, // front gear (right)
+            5.6f, 3.3f, // rear gear (left)
+            4.9f, 4.1f // bottom rear fuselage (left)
         });
 
         // Initialize aerodynamic coefficients
@@ -69,10 +73,11 @@ public class Aircraft {
     }
 
     public void update(float timeStep) {
-        updateAerodynamics(); // update forces and moment
+        updateAerodynamics(); // update Aerodynamic forces and moment
+        gear.updateNormalForcesAndMoment();
 
         // rotation
-        pitchAcceleration = pitchMoment / momentOfInertia;
+        pitchAcceleration = (pitchMoment + gear.getMoment()) / momentOfInertia;
         pitchRate = integrate(pitchRate, pitchAcceleration, timeStep);
         pitchAngle = putInDomain(integrate(pitchAngle, pitchRate, timeStep));
 //        if (noseUp != pitchAngle > 0){
@@ -97,6 +102,8 @@ public class Aircraft {
         resultantForce.add(aerodynamicForce);
         resultantForce.add(weight);
         resultantForce.add(thrust);
+        resultantForce.add(gear.getNormalFront());
+        resultantForce.add(gear.getNormalRear());
 
         acceleration.y = resultantForce.y / mass;
         acceleration.x = resultantForce.x / mass;
@@ -120,8 +127,10 @@ public class Aircraft {
         hitBox.setRotation(sprite.getRotation());
         float [] vertices = hitBox.getTransformedVertices();
         for (int i = 1; i < vertices.length; i += 2){
-            if (vertices[i] < 0) {
-                return true;
+            if (i != 11 && i != 13) { // skip the landing gear y positions
+                if (vertices[i] < 0) {
+                    return true;
+                }
             }
         }
         return false;
@@ -176,7 +185,7 @@ public class Aircraft {
     public void reset() {
         System.out.println("reset");
 
-        this.position = new Vector2(0, 2133.6f); // 0, 2500 (service ceiling = 4267.2f)
+        this.position = new Vector2(0, 50 / UnitConversionUtils.getM2Feet()); // 0, 2500 (service ceiling = 4267.2f)
         this.velocity = new Vector2(55, 0); // 55, 0
         this.acceleration = new Vector2(0, 0);
         this.throttle = 75; // 75
@@ -189,6 +198,7 @@ public class Aircraft {
         this.pitchAngle = 0; // -15
         this.pitchRate = 0; // 0
         this.pitchAcceleration = 0; // 0
+        this.gear.reset();
 
         if (this.autoPilot != null) {
             autoPilot.pitchController.resetErrorIntegral();
@@ -305,14 +315,14 @@ public class Aircraft {
     }
 
     public void render(SpriteBatch batch) {
+        sprite.setPosition(position.x - sprite.getWidth() * 0.6f, position.y - 0.5f * sprite.getHeight());
         sprite.setRotation(pitchAngle);
-        sprite.setPosition(position.x - sprite.getWidth() * 0.6f, position.y - sprite.getHeight() / 2);
 
         sprite.draw(batch);
     }
 
     public float getStallSpeed() {
-        return (float) Math.sqrt(2 * weight.len() / (getAir().getDensity() * wingArea * 1.5f));
+        return (float) Math.sqrt(2 * weight.len() / (getAir().getDensity() * wingArea * 1.5f)); // todo: update CL max
     }
 
     public float getMachNumber(){
@@ -337,5 +347,23 @@ public class Aircraft {
 
     public void renderHitBox(ShapeRenderer shape) {
         shape.polygon(hitBox.getTransformedVertices());
+    }
+
+    public Polygon getHitBox() {
+        return hitBox;
+    }
+
+    public Gear getGear() {
+        return gear;
+    }
+
+    public void renderCenterOfGravity(ShapeRenderer shape){
+//        shape.circle(position.x, position.y, 0.1f, 20);
+//        shape.circle(sprite.getOriginX(), sprite.getOriginY(), 0.1f, 20);
+        shape.circle(sprite.getX() + 0.6f * sprite.getWidth(), sprite.getY() + 0.5f * sprite.getHeight(), 0.1f, 20);
+    }
+
+    public Sprite getSprite(){
+        return sprite;
     }
 }
