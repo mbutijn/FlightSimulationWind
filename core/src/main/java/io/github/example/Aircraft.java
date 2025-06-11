@@ -10,17 +10,17 @@ import com.badlogic.gdx.math.Vector2;
 
 public class Aircraft {
     private final int mass;
-    private final float momentOfInertia, wingArea;
-    private Vector2 position, velocity, acceleration, resultantForce, aerodynamicForce;
+    private final float momentOfInertia;
+    private Vector2 position, velocity, acceleration, resultantForce;
     private final Vector2 wind, weight;
-    private float angleOfAttack, airspeed, indicatedAirspeed, climbRate, drag, pitchAngle, pitchRate, pitchAcceleration, pitchMoment, Cm_deltaE, flightPathAngle;
-    private final AerodynamicCoefficient Cl, Cd, Cm;
+    private float climbRate, pitchAngle, pitchRate, pitchAcceleration, pitchMoment, Cm_deltaE;
     private final AutoPilot autoPilot;
     private final Air air;
     private final Engine engine;
     private final Sprite sprite;
     private final Polygon hitBox;
     private final Gear gear;
+    private final Wing wing;
     private final Vector2 cgPosition;
 //    private boolean noseUp;
 //    private long time;
@@ -30,7 +30,7 @@ public class Aircraft {
         this.momentOfInertia = 2100; // kg * m^4
         this.weight = new Vector2(0, -9.807f * mass); // Weight => 9807 N
         this.wind = new Vector2(-20, 0); // -20, 0
-        this.wingArea = 16.17f; // wing surface area [m²]
+        this.wing = new Wing(this);
         this.air = air;
         this.engine = new Engine(this);
         this.sprite = new Sprite(new Texture("aircraft.png"));
@@ -53,19 +53,9 @@ public class Aircraft {
         this.gear.reset();
         this.autoPilot = new AutoPilot(this);
 
-        // Initialize aerodynamic coefficients
-        Cl = new AerodynamicCoefficient(new float[]{-180, -90, -30, -20, -10, 0, 8, 10, 12, 15, 18, 21, 26, 32, 60, 90, 135, 180},
-            new float[]{0, -0.07f, -0.29f, -0.79f, -0.64f, 0.2f, 1.3f, 1.4f, 1.45f, 1.4f, 1.1f, 0.6f, 0.3f, 0.15f, 0.05f, -0.05f, -0.2f, 0});
-        Cd = new AerodynamicCoefficient(new float[]{-180, -90, -50, -20, -15, -10, -5, 0, 5, 8, 10, 12, 15, 20, 50, 90, 180},
-            new float[]{0.05f, 1.35f, 0.6f,  0.22f,  0.16f, 0.08f, 0.045f, 0.02f, 0.025f, 0.032f, 0.045f, 0.07f, 0.12f,  0.22f, 0.6f, 1.35f, 0.05f});
-        Cm = new AerodynamicCoefficient(new float[]{-180, -135, -90, -60, -30, -20, -10, 0, 10, 20, 30, 60, 90, 135, 180},
-            new float[]{0, 0.15f, 0.2f, 0.18f, 0.1f, 0.06f, 0.02f, -0.05f, -0.08f, -0.1f, -0.12f, -0.18f, -0.2f, -0.15f, 0}); // approx neg sin wave
-
         Cm_deltaE = 0.05f;
         ElevatorDataUI.setDeflection(Cm_deltaE);
 
-//        maxPower = 0.8f * 134225.977f; // at sea level
-//        powerPerThrottle = 0.01f * maxPower;
 //        this.time = System.currentTimeMillis();
     }
 
@@ -74,7 +64,9 @@ public class Aircraft {
     }
 
     public void update(float timeStep) {
-        updateAerodynamics(); // update Aerodynamic forces and moment
+        air.updateProperties(position.y);
+
+        wing.updateAerodynamics(velocity.cpy().sub(wind), air, Cm_deltaE); // update Aerodynamic forces and moment
         gear.updateNormalForcesAndMoment(timeStep);
 
         // rotation
@@ -93,7 +85,7 @@ public class Aircraft {
 
         // translation
         resultantForce.setZero();
-        resultantForce.add(aerodynamicForce);
+        resultantForce.add(wing.getAerodynamicForce());
         resultantForce.add(weight);
         resultantForce.add(engine.getThrust());
         resultantForce.add(gear.getFrontWheel().getReactionForce());
@@ -138,27 +130,6 @@ public class Aircraft {
         }
     }
 
-    private void updateAerodynamics() {
-        Vector2 windRelativeToAircraft = velocity.cpy().sub(wind);
-        airspeed = windRelativeToAircraft.len();
-        flightPathAngle = putInDomain(windRelativeToAircraft.angleDeg()); // angle between aircraft velocity vector and wind velocity vector
-        angleOfAttack = putInDomain(pitchAngle - flightPathAngle);
-        air.updateProperties(position.y);
-        float airDensity = air.getDensity();
-        indicatedAirspeed = (float) (airspeed * Math.sqrt(airDensity / air.getRho0()));
-
-        float dynamicPressure = 0.5f * airDensity * windRelativeToAircraft.len2();
-        float totalCm = Cm.calculateCoefficient(angleOfAttack) -0.007f * pitchRate + Cm_deltaE; // pitch moment coefficient
-        float chordLength = 1.48f;
-        pitchMoment = totalCm * dynamicPressure * wingArea * chordLength; // pitch moment
-
-        aerodynamicForce.y = Cl.calculateCoefficient(angleOfAttack) * dynamicPressure * wingArea; // lift
-        drag = Cd.calculateCoefficient(angleOfAttack) * dynamicPressure * wingArea;
-        aerodynamicForce.x = -drag; // drag
-//        System.out.println("L over D: " + aerodynamicForce.y / -aerodynamicForce.x);
-        aerodynamicForce.rotateDeg(flightPathAngle); // put in airspeed frame
-    }
-
     private float putInDomain(float angle){
         while (angle < -180){
             angle += 360;
@@ -177,9 +148,7 @@ public class Aircraft {
         this.acceleration = new Vector2(0, 0);
         this.engine.reset();
 
-        // forces
         this.resultantForce = new Vector2(0, 0);
-        this.aerodynamicForce = new Vector2(0, 0);
 
         // angle dynamics
         this.pitchAngle = 3; // -15
@@ -232,30 +201,6 @@ public class Aircraft {
         return pitchAngle;
     }
 
-    public AerodynamicCoefficient getCl() {
-        return Cl;
-    }
-
-    public AerodynamicCoefficient getCd(){
-        return Cd;
-    }
-
-    public AerodynamicCoefficient getCm(){
-        return Cm;
-    }
-
-    public float getTrueAirspeed(){
-        return airspeed;
-    }
-
-    public float getAngleOfAttack(){
-        return angleOfAttack;
-    }
-
-    public float getIndicatedAirspeed(){
-        return indicatedAirspeed;
-    }
-
     public float getWeight(){
         return weight.len();
     }
@@ -288,23 +233,15 @@ public class Aircraft {
     }
 
     public float getStallSpeed() {
-        return (float) Math.sqrt(2 * weight.len() / (getAir().getDensity() * wingArea * 1.5f)); // todo: update CL max
+        return (float) Math.sqrt(2 * weight.len() / (getAir().getDensity() * wing.getArea() * 1.5f)); // todo: update CL max
     }
 
     public float getMachNumber(){
-        return airspeed / getAir().speedOfSound;
+        return wing.getTrueAirspeed() / getAir().speedOfSound;
     }
 
     public float getVerticalAcceleration(){
         return getAcceleration().y / 9.807f + 1;
-    }
-
-    public float getDrag(){
-        return drag;
-    }
-
-    public double getFlightPathAngle() {
-        return Math.toRadians(flightPathAngle);
     }
 
     public void renderHitBox(ShapeRenderer shape) {
@@ -335,5 +272,13 @@ public class Aircraft {
 
     public Engine getEngine(){
         return engine;
+    }
+
+    public Wing getWing(){
+        return wing;
+    }
+
+    public void setPitchMoment(float pitchMoment) {
+        this.pitchMoment = pitchMoment;
     }
 }

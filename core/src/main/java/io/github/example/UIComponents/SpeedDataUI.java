@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import io.github.example.Aircraft;
 import io.github.example.UnitConversionUtils;
+import io.github.example.Wing;
 
 public class SpeedDataUI extends FlightDataUI{
     public SpeedDataUI(Aircraft aircraft, Viewport viewport, ShapeRenderer shape, SpriteBatch batch, float x, float y) {
@@ -12,8 +13,9 @@ public class SpeedDataUI extends FlightDataUI{
     }
 
     public void writeValues(){
-        font.draw(batch, "TAS: " + formatOneDecimal(aircraft.getTrueAirspeed() * UnitConversionUtils.getMps2Knts()) + " knts", x, y);
-        font.draw(batch, "IAS: " + formatOneDecimal(aircraft.getIndicatedAirspeed() * UnitConversionUtils.getMps2Knts()) + " knts", x + 2, y - 20);
+        Wing wing = aircraft.getWing();
+        font.draw(batch, "TAS: " + formatOneDecimal(wing.getTrueAirspeed() * UnitConversionUtils.getMps2Knts()) + " knts", x, y);
+        font.draw(batch, "IAS: " + formatOneDecimal(wing.getIndicatedAirspeed() * UnitConversionUtils.getMps2Knts()) + " knts", x + 2, y - 20);
         font.draw(batch, "Mach: " + formatTwoDecimals(aircraft.getMachNumber()), x + 2, y - 40);
         font.draw(batch, "acceleration: " + formatOneDecimal(aircraft.getVerticalAcceleration()) + " g", x, y - 80);
     }

@@ -35,12 +35,12 @@ public class AngleOfAttackDataUI extends FlightDataUI {
     }
 
     public void writeValues() {
-        font.draw(batch, "AoA: " + formatOneDecimal(aircraft.getAngleOfAttack()) + " deg", x - 40, y - 40);
+        font.draw(batch, "AoA: " + formatOneDecimal(aircraft.getWing().getAngleOfAttack()) + " deg", x - 40, y - 40);
     }
 
     public void draw(){
         shape.setColor(color);
-        indicator.setRotation(aircraft.getAngleOfAttack());
+        indicator.setRotation(aircraft.getWing().getAngleOfAttack());
         shape.polygon(indicator.getTransformedVertices());
     }
 

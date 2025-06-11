@@ -11,15 +11,17 @@ public class AutoPilot {
     private AutoPilotMode mode;
     private boolean autoThrottle;
     private boolean climbAndHold;
+    private final Wing wing;
     public PIDController pitchController, verticalSpeedController, altitudeController;
 
     public AutoPilot (Aircraft aircraft){
         this.aircraft = aircraft;
+        this.wing = aircraft.getWing();
         this.mode = AutoPilotMode.PITCH_HOLD;
         this.setPitchAngle = 0;
         this.setClimbRate = 0;
         this.setAltitude = aircraft.getPosition().y;
-        this.setAirspeed = aircraft.getTrueAirspeed();
+        this.setAirspeed = wing.getTrueAirspeed();
         this.climbAndHold = false;
         this.pitchController = new PIDController(1, 0.005f, -0.3f, -1, 1);
         this.verticalSpeedController = new PIDController(0.1f, 0.001f, -0.2f, -1, 1);
@@ -78,8 +80,8 @@ public class AutoPilot {
     }
 
     public int calculateAutoThrottle() {
-        float airspeed = aircraft.getTrueAirspeed();
-        float powerReq = (aircraft.getDrag() * airspeed + aircraft.getWeight() * airspeed * (float) Math.sin(aircraft.getFlightPathAngle()))
+        float airspeed = wing.getTrueAirspeed();
+        float powerReq = (wing.getDrag() * airspeed + aircraft.getWeight() * airspeed * (float) Math.sin(wing.getFlightPathAngle()))
                 * aircraft.getAir().getInvertedDensityRatio();
 
         float power = powerReq + 10000 * (setAirspeed - airspeed);
@@ -132,7 +134,7 @@ public class AutoPilot {
 
     public void toggleAutoThrottle() {
         autoThrottle = !autoThrottle;
-        this.setAirspeed = Math.round(aircraft.getTrueAirspeed() / UnitConversionUtils.getMps2Knts()) * UnitConversionUtils.getMps2Knts();
+        this.setAirspeed = Math.round(wing.getTrueAirspeed() / UnitConversionUtils.getMps2Knts()) * UnitConversionUtils.getMps2Knts();
         System.out.println("Auto throttle: " + autoThrottle);
     }
 

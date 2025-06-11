@@ -109,7 +109,9 @@ public class FlightSimulation extends ApplicationAdapter implements InputProcess
             AutoPilot autoPilot = aircraft.getAutoPilot();
             altitudeTape.drawTape(aircraft.getPosition().y * UnitConversionUtils.getM2Feet(), steeringMode == SteeringMode.AUTO_PILOT && autoPilot.drawSetAltitude(), autoPilot.getSetAltitude() * UnitConversionUtils.getM2Feet());
             altitudeTape.drawStaticPart();
-            velocityTape.drawTape(aircraft.getTrueAirspeed() * UnitConversionUtils.getMps2Knts(), steeringMode == SteeringMode.AUTO_PILOT && autoPilot.drawSetAirspeed(), autoPilot.getSetAirspeed() * UnitConversionUtils.getMps2Knts());
+
+            Wing wing = aircraft.getWing();
+            velocityTape.drawTape(wing.getTrueAirspeed() * UnitConversionUtils.getMps2Knts(), steeringMode == SteeringMode.AUTO_PILOT && autoPilot.drawSetAirspeed(), autoPilot.getSetAirspeed() * UnitConversionUtils.getMps2Knts());
             velocityTape.drawStallRegionsWarning(aircraft.getStallSpeed() * UnitConversionUtils.getMps2Knts());
             shape.setColor(FlightDataUI.color);
             velocityTape.drawStaticPart();
@@ -154,7 +156,7 @@ public class FlightSimulation extends ApplicationAdapter implements InputProcess
                 flightDataUI.writeValues();
             }
             altitudeTape.writeValues(aircraft.getPosition().y * UnitConversionUtils.getM2Feet());
-            velocityTape.writeValues(aircraft.getTrueAirspeed() * UnitConversionUtils.getMps2Knts());
+            velocityTape.writeValues(wing.getTrueAirspeed() * UnitConversionUtils.getMps2Knts());
             steeringModeDataUI.writeSteeringMode(steeringMode);
 
             batch.end();
