@@ -83,7 +83,7 @@ public class AutoPilot {
                 * aircraft.getAir().getInvertedDensityRatio();
 
         float power = powerReq + 10000 * (setAirspeed - airspeed);
-        int throttle = Math.round(100 * power / aircraft.getMaxPower());
+        int throttle = Math.round(100 * power / aircraft.getEngine().getMaxPower());
 
         // limit values
         int minValue = 0;

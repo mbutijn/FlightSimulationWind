@@ -36,8 +36,12 @@ public class Wheel {
         }
     }
 
-    public void brake(){
-        reactionForce.x = -1000;
+    public void brake(float velocity){
+        if (velocity > 0) {
+            reactionForce.x = -1000;
+        } else {
+            reactionForce.x = 1000;
+        }
     }
 
     public void releaseBrake(){

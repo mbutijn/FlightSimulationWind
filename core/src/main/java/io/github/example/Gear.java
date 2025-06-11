@@ -39,16 +39,16 @@ public class Gear {
     }
 
     public void brake(){
-        if (aircraft.getVelocity().x > 0) {
+//        if (aircraft.getVelocity().x > 0) {
             if (frontWheel.isOnGround()) {
-                frontWheel.brake();
+                frontWheel.brake(aircraft.getVelocity().x);
             }
             if (rearWheel.isOnGround()) {
-                rearWheel.brake();
+                rearWheel.brake(aircraft.getVelocity().x);
             }
-        } else {
-            releaseBrake();
-        }
+//        } else {
+//            releaseBrake();
+//        }
     }
 
     public void releaseBrake(){

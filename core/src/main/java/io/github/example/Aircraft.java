@@ -10,17 +10,16 @@ import com.badlogic.gdx.math.Vector2;
 
 public class Aircraft {
     private final int mass;
-    private final float momentOfInertia, wingArea, powerPerThrottle, maxPower;
+    private final float momentOfInertia, wingArea;
     private Vector2 position, velocity, acceleration, resultantForce, aerodynamicForce;
-    private final Vector2 wind, weight, thrust;
+    private final Vector2 wind, weight;
     private float angleOfAttack, airspeed, indicatedAirspeed, climbRate, drag, pitchAngle, pitchRate, pitchAcceleration, pitchMoment, Cm_deltaE, flightPathAngle;
     private final AerodynamicCoefficient Cl, Cd, Cm;
     private final AutoPilot autoPilot;
     private final Air air;
+    private final Engine engine;
     private final Sprite sprite;
     private final Polygon hitBox;
-    private int throttle;
-    private ChangeThrottle changeThrottle;
     private final Gear gear;
     private final Vector2 cgPosition;
 //    private boolean noseUp;
@@ -30,11 +29,10 @@ public class Aircraft {
         this.mass = mass;
         this.momentOfInertia = 2100; // kg * m^4
         this.weight = new Vector2(0, -9.807f * mass); // Weight => 9807 N
-        this.wind = new Vector2(0, 0); // -20, 0
-        this.thrust = new Vector2(0, 0);
-        this.changeThrottle = ChangeThrottle.NONE;
+        this.wind = new Vector2(-20, 0); // -20, 0
         this.wingArea = 16.17f; // wing surface area [m²]
         this.air = air;
+        this.engine = new Engine(this);
         this.sprite = new Sprite(new Texture("aircraft.png"));
         this.cgPosition = new Vector2(0.65f, 0.5f);
         sprite.setSize(10, 10);
@@ -66,8 +64,8 @@ public class Aircraft {
         Cm_deltaE = 0.05f;
         ElevatorDataUI.setDeflection(Cm_deltaE);
 
-        maxPower = 0.8f * 134225.977f; // at sea level
-        powerPerThrottle = 0.01f * maxPower;
+//        maxPower = 0.8f * 134225.977f; // at sea level
+//        powerPerThrottle = 0.01f * maxPower;
 //        this.time = System.currentTimeMillis();
     }
 
@@ -91,20 +89,13 @@ public class Aircraft {
 //        noseUp = pitchAngle > 0;
 
         // update the throttle
-        if (changeThrottle == ChangeThrottle.DOWN){
-            throttleDown();
-        }
-        if (changeThrottle == ChangeThrottle.UP){
-            throttleUp();
-        }
-        updateThrust();
+        engine.update();
 
         // translation
         resultantForce.setZero();
-
         resultantForce.add(aerodynamicForce);
         resultantForce.add(weight);
-        resultantForce.add(thrust);
+        resultantForce.add(engine.getThrust());
         resultantForce.add(gear.getFrontWheel().getReactionForce());
         resultantForce.add(gear.getRearWheel().getReactionForce());
 
@@ -143,8 +134,7 @@ public class Aircraft {
         autoPilot.calculateElevatorDeflection();
 
         if (autoPilot.getAutoThrottle()) {
-            this.throttle = autoPilot.calculateAutoThrottle();
-            updateThrust();
+            engine.updateAutoThrottle(autoPilot.calculateAutoThrottle());
         }
     }
 
@@ -169,12 +159,6 @@ public class Aircraft {
         aerodynamicForce.rotateDeg(flightPathAngle); // put in airspeed frame
     }
 
-    public void updateThrust(){
-        thrust.x = throttle * powerPerThrottle * air.getDensityRatio() / airspeed;
-        thrust.y = 0;
-        thrust.rotateDeg(pitchAngle); // engine is attached to the vehicle
-    }
-
     private float putInDomain(float angle){
         while (angle < -180){
             angle += 360;
@@ -191,7 +175,7 @@ public class Aircraft {
         this.position = new Vector2(0, 50 / UnitConversionUtils.getM2Feet()); // 0, 2500 (service ceiling = 4267.2f)
         this.velocity = new Vector2(35, -3); // 55, 0
         this.acceleration = new Vector2(0, 0);
-        this.throttle = 25; // 75
+        this.engine.reset();
 
         // forces
         this.resultantForce = new Vector2(0, 0);
@@ -272,22 +256,6 @@ public class Aircraft {
         return indicatedAirspeed;
     }
 
-    public void setChangeThrottle(ChangeThrottle change){
-        changeThrottle = change;
-    }
-
-    public void throttleDown() {
-        if (throttle > 0) {
-            throttle--;
-        }
-    }
-
-    public void throttleUp() {
-        if (throttle < 100) {
-            throttle++;
-        }
-    }
-
     public float getWeight(){
         return weight.len();
     }
@@ -302,10 +270,6 @@ public class Aircraft {
 
     public AutoPilot getAutoPilot(){
         return autoPilot;
-    }
-
-    public int getThrottle(){
-        return throttle;
     }
 
     public float getClimbRate(){
@@ -333,10 +297,6 @@ public class Aircraft {
 
     public float getVerticalAcceleration(){
         return getAcceleration().y / 9.807f + 1;
-    }
-
-    public float getMaxPower() {
-        return maxPower;
     }
 
     public float getDrag(){
@@ -371,5 +331,9 @@ public class Aircraft {
 
     public Vector2 getCgPosition(){
         return cgPosition;
+    }
+
+    public Engine getEngine(){
+        return engine;
     }
 }

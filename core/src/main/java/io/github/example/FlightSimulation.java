@@ -187,10 +187,10 @@ public class FlightSimulation extends ApplicationAdapter implements InputProcess
             System.out.println("paused: " + paused);
         }
         if (keycode == Input.Keys.PAGE_DOWN){
-            aircraft.setChangeThrottle(ChangeThrottle.DOWN);
+            aircraft.getEngine().setChangeThrottle(ChangeThrottle.DOWN);
         }
         if (keycode == Input.Keys.PAGE_UP){
-            aircraft.setChangeThrottle(ChangeThrottle.UP);
+            aircraft.getEngine().setChangeThrottle(ChangeThrottle.UP);
         }
         if (keycode == Input.Keys.HOME){
             worldCamera.zoom = 0.1f;
@@ -204,7 +204,7 @@ public class FlightSimulation extends ApplicationAdapter implements InputProcess
     @Override
     public boolean keyUp(int keycode) {
         if (keycode == Input.Keys.PAGE_DOWN || keycode == Input.Keys.PAGE_UP) {
-            aircraft.setChangeThrottle(ChangeThrottle.NONE);
+            aircraft.getEngine().setChangeThrottle(ChangeThrottle.NONE);
         }
         if (keycode == Input.Keys.B){
             aircraft.getGear().setBrakeCommand(BrakeCommand.RELEASE_BRAKE);
