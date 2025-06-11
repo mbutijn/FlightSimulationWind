@@ -77,7 +77,7 @@ public class Aircraft {
 
     public void update(float timeStep) {
         updateAerodynamics(); // update Aerodynamic forces and moment
-        gear.updateNormalForcesAndMoment();
+        gear.updateNormalForcesAndMoment(timeStep);
 
         // rotation
         pitchAcceleration = (pitchMoment + gear.getMoment()) / momentOfInertia;
@@ -189,16 +189,16 @@ public class Aircraft {
         System.out.println("reset");
 
         this.position = new Vector2(0, 50 / UnitConversionUtils.getM2Feet()); // 0, 2500 (service ceiling = 4267.2f)
-        this.velocity = new Vector2(55, 0); // 55, 0
+        this.velocity = new Vector2(35, -3); // 55, 0
         this.acceleration = new Vector2(0, 0);
-        this.throttle = 75; // 75
+        this.throttle = 25; // 75
 
         // forces
         this.resultantForce = new Vector2(0, 0);
         this.aerodynamicForce = new Vector2(0, 0);
 
         // angle dynamics
-        this.pitchAngle = 0; // -15
+        this.pitchAngle = 3; // -15
         this.pitchRate = 0; // 0
         this.pitchAcceleration = 0; // 0
 

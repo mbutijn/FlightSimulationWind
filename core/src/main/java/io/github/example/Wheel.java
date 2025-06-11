@@ -6,27 +6,30 @@ public class Wheel {
     private final Vector2 position, reactionForce;
     private final float angle;
     private float moment;
-    private final float stiffness;
+    private final float stiffness, damping;
+    private float previousDisplacement;
     private boolean onGround;
 
-    public Wheel(float x, float y, float stiffness){
+    public Wheel(float x, float y, float stiffness, float damping){
         this.position = new Vector2(x, y);
         this.reactionForce = new Vector2(0, 0);
         this.angle = position.angleDeg();
         this.moment = 0;
         this.stiffness = stiffness;
+        this.damping = damping;
         this.onGround = false;
     }
 
-    public void updateReactionForceAndMoment(float pitchAngle, float y){
+    public void updateReactionForceAndMoment(float pitchAngle, float yAircraft, float dt){
         position.setAngleDeg(pitchAngle + angle);
 
-        float displacement = position.y + y;
+        float displacement = position.y + yAircraft;
 
         if (displacement < 0){
-            reactionForce.y = -stiffness * displacement;
+            reactionForce.y = -stiffness * displacement - damping * (displacement - previousDisplacement) / dt;
             moment = (position.x * reactionForce.y) - (position.y * reactionForce.x); // cross product
             onGround = true;
+            previousDisplacement = displacement;
         } else {
             reactionForce.y = 0;
             onGround = false;

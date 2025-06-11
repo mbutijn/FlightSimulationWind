@@ -19,14 +19,14 @@ public class Gear {
         float x_cg = aircraft.getSprite().getX() + aircraft.getCgPosition().x * aircraft.getSprite().getWidth();
         float y_cg = aircraft.getSprite().getY() + aircraft.getCgPosition().y * aircraft.getSprite().getHeight();
 
-        this.frontWheel = new Wheel(xFront - x_cg, yFront - y_cg, 0.7f * 37634.7f);
-        this.rearWheel = new Wheel(xRear - x_cg, yRear - y_cg, 1.3f * 37634.7f);
+        this.frontWheel = new Wheel(xFront - x_cg, yFront - y_cg, 0.7f * 37634.7f, 5000);
+        this.rearWheel = new Wheel(xRear - x_cg, yRear - y_cg, 1.3f * 37634.7f, 5000);
         this.brakeCommand = BrakeCommand.RELEASE_BRAKE;
     }
 
-    public void updateNormalForcesAndMoment() {
-        frontWheel.updateReactionForceAndMoment(aircraft.getPitchAngle(), aircraft.getPosition().y);
-        rearWheel.updateReactionForceAndMoment(aircraft.getPitchAngle(), aircraft.getPosition().y);
+    public void updateNormalForcesAndMoment(float dt) {
+        frontWheel.updateReactionForceAndMoment(aircraft.getPitchAngle(), aircraft.getPosition().y, dt);
+        rearWheel.updateReactionForceAndMoment(aircraft.getPitchAngle(), aircraft.getPosition().y, dt);
 
         if (brakeCommand == BrakeCommand.BRAKE){
             brake();

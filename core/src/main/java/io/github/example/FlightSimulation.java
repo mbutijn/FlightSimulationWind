@@ -133,8 +133,8 @@ public class FlightSimulation extends ApplicationAdapter implements InputProcess
 
             shape.begin(ShapeRenderer.ShapeType.Line);
             shape.setProjectionMatrix(worldCamera.combined);
-            aircraft.renderHitBox(shape);
-            aircraft.renderCenterOfGravity(shape);
+//            aircraft.renderHitBox(shape);
+//            aircraft.renderCenterOfGravity(shape);
             uiViewport.apply();
             shape.setProjectionMatrix(uiCamera.combined);
 
