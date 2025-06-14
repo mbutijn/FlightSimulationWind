@@ -12,7 +12,10 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import io.github.example.AircraftComponents.AutoPilot;
+import io.github.example.AircraftComponents.Wing;
 import io.github.example.UIComponents.*;
+import io.github.example.utils.UnitConversionUtils;
 
 public class FlightSimulation extends ApplicationAdapter implements InputProcessor {
     private final OrthographicCamera worldCamera, uiCamera;

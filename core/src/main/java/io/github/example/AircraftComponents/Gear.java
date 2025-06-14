@@ -1,4 +1,7 @@
-package io.github.example;
+package io.github.example.AircraftComponents;
+
+import io.github.example.Aircraft;
+import io.github.example.BrakeCommand;
 
 public class Gear {
     private final Aircraft aircraft;
@@ -19,42 +22,27 @@ public class Gear {
         float x_cg = aircraft.getSprite().getX() + aircraft.getCgPosition().x * aircraft.getSprite().getWidth();
         float y_cg = aircraft.getSprite().getY() + aircraft.getCgPosition().y * aircraft.getSprite().getHeight();
 
-        this.frontWheel = new Wheel(xFront - x_cg, yFront - y_cg, 0.7f * 37634.7f, 5000);
-        this.rearWheel = new Wheel(xRear - x_cg, yRear - y_cg, 1.3f * 37634.7f, 5000);
+        this.frontWheel = new Wheel(aircraft, xFront - x_cg, yFront - y_cg, 0.7f * 37634.7f, 5000);
+        this.rearWheel = new Wheel(aircraft, xRear - x_cg, yRear - y_cg, 1.3f * 37634.7f, 5000);
         this.brakeCommand = BrakeCommand.RELEASE_BRAKE;
     }
 
     public void updateNormalForcesAndMoment(float dt) {
-        frontWheel.updateReactionForceAndMoment(aircraft.getPitchAngle(), aircraft.getPosition().y, dt);
-        rearWheel.updateReactionForceAndMoment(aircraft.getPitchAngle(), aircraft.getPosition().y, dt);
-
-        if (brakeCommand == BrakeCommand.BRAKE){
-            brake();
-        } else if (brakeCommand == BrakeCommand.RELEASE_BRAKE) {
-            releaseBrake();
-        }
+        frontWheel.updateReactionForceAndMoment(dt, frontWheel.isOnGround() && brakeCommand == BrakeCommand.BRAKE);
+        rearWheel.updateReactionForceAndMoment(dt, rearWheel.isOnGround() && brakeCommand == BrakeCommand.BRAKE);
 
         moment = frontWheel.getMoment();
         moment += rearWheel.getMoment();
     }
 
-    public void brake(){
-//        if (aircraft.getVelocity().x > 0) {
-            if (frontWheel.isOnGround()) {
-                frontWheel.brake(aircraft.getVelocity().x);
-            }
-            if (rearWheel.isOnGround()) {
-                rearWheel.brake(aircraft.getVelocity().x);
-            }
-//        } else {
-//            releaseBrake();
-//        }
-    }
+//    public void brake() {
+//
+//    }
 
-    public void releaseBrake(){
-        frontWheel.releaseBrake();
-        rearWheel.releaseBrake();
-    }
+//    public void releaseBrake(){
+//        frontWheel.releaseBrake();
+//        rearWheel.releaseBrake();
+//    }
 
     public Wheel getFrontWheel() {
         return frontWheel;

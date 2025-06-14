@@ -2,11 +2,17 @@ package io.github.example;
 
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Polygon;
+import io.github.example.AircraftComponents.AutoPilot;
+import io.github.example.AircraftComponents.Engine;
+import io.github.example.AircraftComponents.Gear;
+import io.github.example.AircraftComponents.Wing;
 import io.github.example.UIComponents.ElevatorDataUI;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
+import io.github.example.utils.MathUtils;
+import io.github.example.utils.UnitConversionUtils;
 
 public class Aircraft {
     private final int mass;
@@ -72,7 +78,7 @@ public class Aircraft {
         // rotation
         pitchAcceleration = (pitchMoment + gear.getMoment()) / momentOfInertia;
         pitchRate = integrate(pitchRate, pitchAcceleration, timeStep);
-        pitchAngle = putInDomain(integrate(pitchAngle, pitchRate, timeStep));
+        pitchAngle = MathUtils.putInDomain(integrate(pitchAngle, pitchRate, timeStep));
 //        if (noseUp != pitchAngle > 0){
 //            long now = System.currentTimeMillis();
 //            System.out.println(now - time);
@@ -128,16 +134,6 @@ public class Aircraft {
         if (autoPilot.getAutoThrottle()) {
             engine.updateAutoThrottle(autoPilot.calculateAutoThrottle());
         }
-    }
-
-    private float putInDomain(float angle){
-        while (angle < -180){
-            angle += 360;
-        }
-        while (angle > 180){
-            angle -= 360;
-        }
-        return angle;
     }
 
     public void reset() {
@@ -280,5 +276,9 @@ public class Aircraft {
 
     public void setPitchMoment(float pitchMoment) {
         this.pitchMoment = pitchMoment;
+    }
+
+    public boolean isMovingForward(){
+        return velocity.x > 0;
     }
 }

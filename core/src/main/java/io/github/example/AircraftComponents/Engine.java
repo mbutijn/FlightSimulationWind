@@ -1,6 +1,8 @@
-package io.github.example;
+package io.github.example.AircraftComponents;
 
 import com.badlogic.gdx.math.Vector2;
+import io.github.example.Aircraft;
+import io.github.example.ChangeThrottle;
 
 public class Engine {
     private final Aircraft aircraft;

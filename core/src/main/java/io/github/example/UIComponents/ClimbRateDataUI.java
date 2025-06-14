@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import io.github.example.Aircraft;
-import io.github.example.UnitConversionUtils;
+import io.github.example.utils.UnitConversionUtils;
 
 public class ClimbRateDataUI extends FlightDataUI {
 

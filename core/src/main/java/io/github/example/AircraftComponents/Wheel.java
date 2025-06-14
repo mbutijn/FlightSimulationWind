@@ -1,8 +1,10 @@
-package io.github.example;
+package io.github.example.AircraftComponents;
 
 import com.badlogic.gdx.math.Vector2;
+import io.github.example.Aircraft;
 
 public class Wheel {
+    private final Aircraft aircraft;
     private final Vector2 position, reactionForce;
     private final float angle;
     private float moment;
@@ -10,7 +12,8 @@ public class Wheel {
     private float previousDisplacement;
     private boolean onGround;
 
-    public Wheel(float x, float y, float stiffness, float damping){
+    public Wheel(Aircraft aircraft, float x, float y, float stiffness, float damping){
+        this.aircraft = aircraft;
         this.position = new Vector2(x, y);
         this.reactionForce = new Vector2(0, 0);
         this.angle = position.angleDeg();
@@ -20,13 +23,21 @@ public class Wheel {
         this.onGround = false;
     }
 
-    public void updateReactionForceAndMoment(float pitchAngle, float yAircraft, float dt){
-        position.setAngleDeg(pitchAngle + angle);
+    public void updateReactionForceAndMoment(float dt, boolean isBraking){
+        position.setAngleDeg(aircraft.getPitchAngle() + angle);
 
-        float displacement = position.y + yAircraft;
+        float displacement = position.y + aircraft.getPosition().y;
 
         if (displacement < 0){
-            reactionForce.y = -stiffness * displacement - damping * (displacement - previousDisplacement) / dt;
+            reactionForce.y = -stiffness * displacement - damping * (displacement - previousDisplacement) / dt; // normal force
+            float frictionCoefficient = aircraft.isMovingForward() ? 0.05f : 0.1f;
+
+            if (aircraft.isMovingForward()) {
+                reactionForce.x = -frictionCoefficient * reactionForce.y + (isBraking ? -1000 : 0);
+            } else {
+                reactionForce.x = frictionCoefficient * reactionForce.y + (isBraking ? 1000 : 0);
+            }
+
             moment = (position.x * reactionForce.y) - (position.y * reactionForce.x); // cross product
             onGround = true;
             previousDisplacement = displacement;
@@ -34,18 +45,6 @@ public class Wheel {
             reactionForce.y = 0;
             onGround = false;
         }
-    }
-
-    public void brake(float velocity){
-        if (velocity > 0) {
-            reactionForce.x = -1000;
-        } else {
-            reactionForce.x = 1000;
-        }
-    }
-
-    public void releaseBrake(){
-        reactionForce.x = 0;
     }
 
     public Vector2 getReactionForce(){

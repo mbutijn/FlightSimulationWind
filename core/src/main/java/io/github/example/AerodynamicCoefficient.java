@@ -9,7 +9,7 @@ public class AerodynamicCoefficient {
         this.coefficients = coefficients;
     }
 
-    protected float calculateCoefficient(float angleOfAttack){
+    public float calculateCoefficient(float angleOfAttack){
         for (int i = 1; i < alphas.length; i++){
             float alpha = alphas[i];
             float previousAlpha = alphas[i-1];

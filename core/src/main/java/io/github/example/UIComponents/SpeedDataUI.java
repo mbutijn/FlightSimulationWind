@@ -4,8 +4,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import io.github.example.Aircraft;
-import io.github.example.UnitConversionUtils;
-import io.github.example.Wing;
+import io.github.example.utils.UnitConversionUtils;
+import io.github.example.AircraftComponents.Wing;
 
 public class SpeedDataUI extends FlightDataUI{
     public SpeedDataUI(Aircraft aircraft, Viewport viewport, ShapeRenderer shape, SpriteBatch batch, float x, float y) {

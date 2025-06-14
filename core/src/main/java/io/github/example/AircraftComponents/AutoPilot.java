@@ -1,6 +1,11 @@
-package io.github.example;
+package io.github.example.AircraftComponents;
 
+import io.github.example.Aircraft;
+import io.github.example.AutoPilotMode;
+import io.github.example.PIDController;
 import io.github.example.UIComponents.ElevatorDataUI;
+import io.github.example.utils.MathUtils;
+import io.github.example.utils.UnitConversionUtils;
 
 public class AutoPilot {
     private final Aircraft aircraft;
@@ -59,12 +64,7 @@ public class AutoPilot {
 
     public void changeSetPitchAngle(float amount){
         setPitchAngle -= amount;
-        if (setPitchAngle < -180){
-            setPitchAngle += 360;
-        }
-        if (setPitchAngle > 180){
-            setPitchAngle -= 360;
-        }
+        setPitchAngle = MathUtils.putInDomain(setPitchAngle);
     }
 
     public float getSetPitchAngle(){

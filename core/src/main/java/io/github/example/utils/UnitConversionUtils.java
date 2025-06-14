@@ -1,4 +1,4 @@
-package io.github.example;
+package io.github.example.utils;
 
 public class UnitConversionUtils {
     private final static float MPS2KNTS = 1.94384f;

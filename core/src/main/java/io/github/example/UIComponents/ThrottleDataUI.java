@@ -4,6 +4,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import io.github.example.*;
+import io.github.example.AircraftComponents.AutoPilot;
+import io.github.example.AircraftComponents.Engine;
+import io.github.example.utils.UnitConversionUtils;
 
 public class ThrottleDataUI extends FlightDataUI {
     private final float radius;

@@ -1,6 +1,10 @@
-package io.github.example;
+package io.github.example.AircraftComponents;
 
 import com.badlogic.gdx.math.Vector2;
+import io.github.example.AerodynamicCoefficient;
+import io.github.example.Air;
+import io.github.example.Aircraft;
+import io.github.example.utils.MathUtils;
 
 public class Wing {
     private final Aircraft aircraft;
@@ -27,8 +31,8 @@ public class Wing {
     public void updateAerodynamics(Vector2 windRelativeToAircraft, Air air, float Cm_deltaE) {
         airspeed = windRelativeToAircraft.len();
         indicatedAirspeed = (float) (airspeed * Math.sqrt(air.getDensityRatio()));
-        flightPathAngle = putInDomain(windRelativeToAircraft.angleDeg()); // angle between aircraft velocity vector and wind velocity vector
-        angleOfAttack = putInDomain(aircraft.getPitchAngle() - flightPathAngle);
+        flightPathAngle = MathUtils.putInDomain(windRelativeToAircraft.angleDeg()); // angle between aircraft velocity vector and wind velocity vector
+        angleOfAttack = MathUtils.putInDomain(aircraft.getPitchAngle() - flightPathAngle);
 
         float dynamicPressure = 0.5f * air.getDensity() * windRelativeToAircraft.len2();
         float totalCm = Cm.calculateCoefficient(angleOfAttack) -0.007f * aircraft.getPitchRate() + Cm_deltaE; // pitch moment coefficient
@@ -40,16 +44,6 @@ public class Wing {
         aerodynamicForce.x = -drag; // drag
 //        System.out.println("L over D: " + aerodynamicForce.y / -aerodynamicForce.x);
         aerodynamicForce.rotateDeg(flightPathAngle); // put in airspeed frame
-    }
-
-    private float putInDomain(float angle){
-        while (angle < -180){
-            angle += 360;
-        }
-        while (angle > 180){
-            angle -= 360;
-        }
-        return angle;
     }
 
     public AerodynamicCoefficient getCl() {
