@@ -56,7 +56,7 @@ public class FlightSimulation extends ApplicationAdapter implements InputProcess
     @Override
     public void create() {
         shape = new ShapeRenderer();
-        aircraft = new Aircraft(1157, air);
+        aircraft = new Aircraft(air);
 
         batch = new SpriteBatch();
         altitudeTape = new DataTape(aircraft, uiViewport, shape, batch, uiViewport.getWorldWidth() - 110, 0.5f * uiViewport.getWorldHeight() - 150);

@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
+import io.github.example.utils.Config;
 import io.github.example.utils.MathUtils;
 import io.github.example.utils.UnitConversionUtils;
 
@@ -18,7 +19,7 @@ public class Aircraft {
     private final int mass;
     private final float momentOfInertia;
     private Vector2 position, velocity, acceleration, resultantForce;
-    private final Vector2 wind, weight;
+    private final Vector2 weight;
     private float climbRate, pitchAngle, pitchRate, pitchAcceleration, pitchMoment, Cm_deltaE;
     private final AutoPilot autoPilot;
     private final Air air;
@@ -31,11 +32,10 @@ public class Aircraft {
 //    private boolean noseUp;
 //    private long time;
 
-    public Aircraft(int mass, Air air) {
-        this.mass = mass;
-        this.momentOfInertia = 2100; // kg * m^4
-        this.weight = new Vector2(0, -9.807f * mass); // Weight => 9807 N
-        this.wind = new Vector2(-20, 0); // -20, 0
+    public Aircraft(Air air) {
+        this.mass = Config.getInt("aircraft1.mass");
+        this.momentOfInertia = Config.getFloat("aircraft1.momentOfInertia"); // kg * m^4
+        this.weight = new Vector2(0, -9.807f * this.mass); // Weight => 11346.699 N
         this.wing = new Wing(this);
         this.air = air;
         this.engine = new Engine(this);
@@ -72,7 +72,7 @@ public class Aircraft {
     public void update(float timeStep) {
         air.updateProperties(position.y);
 
-        wing.updateAerodynamics(velocity.cpy().sub(wind), air, Cm_deltaE); // update Aerodynamic forces and moment
+        wing.updateAerodynamics(air, Cm_deltaE); // update Aerodynamic forces and moment
         gear.updateNormalForcesAndMoment(timeStep);
 
         // rotation
@@ -229,7 +229,7 @@ public class Aircraft {
     }
 
     public float getStallSpeed() {
-        return (float) Math.sqrt(2 * weight.len() / (getAir().getDensity() * wing.getArea() * 1.5f)); // todo: update CL max
+        return (float) Math.sqrt(2 * weight.len() / (getAir().getDensity() * wing.getArea() * 1.45f));
     }
 
     public float getMachNumber(){

@@ -3,6 +3,7 @@ package io.github.example.AircraftComponents;
 import com.badlogic.gdx.math.Vector2;
 import io.github.example.Aircraft;
 import io.github.example.ChangeThrottle;
+import io.github.example.utils.Config;
 
 public class Engine {
     private final Aircraft aircraft;
@@ -14,7 +15,7 @@ public class Engine {
     public Engine(Aircraft aircraft){
         this.thrust = new Vector2(0, 0);
         this.aircraft = aircraft;
-        this.maxPower = 0.8f * 134225.977f; // at sea level
+        this.maxPower = Config.getFloat("aircraft1.maxPower") * Config.getFloat("aircraft1.propEfficiency"); // at sea level
         this.powerPerThrottle = 0.01f * maxPower;
         this.changeThrottle = ChangeThrottle.NONE;
     }
