@@ -43,7 +43,7 @@ public class AutoPilotModeDataUI extends FlightDataUI {
         }
     }
 
-    public void draw(){
+    public void draw() {
         AutoPilotMode mode = autoPilot.getMode();
         if (FlightSimulation.getSteeringMode() == SteeringMode.AUTO_PILOT && mode != AutoPilotMode.PITCH_HOLD) {
             shape.circle(x + xMid, y + yFineButton, radius);
@@ -98,6 +98,7 @@ public class AutoPilotModeDataUI extends FlightDataUI {
 
     public void writeValues() {
         if (FlightSimulation.getSteeringMode() == SteeringMode.AUTO_PILOT) {
+            font.setColor(Color.MAGENTA);
             AutoPilotMode autoPilotMode = autoPilot.getMode();
             String mode = "";
             String unit = "";
@@ -138,7 +139,7 @@ public class AutoPilotModeDataUI extends FlightDataUI {
         }
     }
 
-    public void writeDialValue(int i, int factor, float yDistance, boolean positive){
+    public void writeDialValue(int i, int factor, float yDistance, boolean positive) {
         String value = positive ? String.valueOf(i * factor) : i == 0 ? "0" : "-" + factor * (10 - i);
         layout.setText(font, value);
         float textWidth = (i == 6 || i == 8) ? layout.width : (i == 0) ? 0.5f * layout.width : 0;

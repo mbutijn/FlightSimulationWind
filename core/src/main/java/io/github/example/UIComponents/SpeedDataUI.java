@@ -12,11 +12,13 @@ public class SpeedDataUI extends FlightDataUI{
         super(aircraft, viewport, shape, batch, x, y);
     }
 
-    public void writeValues(){
+    public void writeValues() {
         Wing wing = aircraft.getWing();
         font.draw(batch, "TAS: " + formatOneDecimal(wing.getTrueAirspeed() * UnitConversionUtils.getMps2Knts()) + " knts", x, y);
         font.draw(batch, "IAS: " + formatOneDecimal(wing.getIndicatedAirspeed() * UnitConversionUtils.getMps2Knts()) + " knts", x + 2, y - 20);
-        font.draw(batch, "Mach: " + formatTwoDecimals(aircraft.getMachNumber()), x + 2, y - 40);
-        font.draw(batch, "acceleration: " + formatOneDecimal(aircraft.getVerticalAcceleration()) + " g", x, y - 80);
+        font.draw(batch, "Headwind: " + formatOneDecimal(-wing.getWind().x * UnitConversionUtils.getMps2Knts()) + " knts", x + 2, y - 40);
+
+        font.draw(batch, "Mach: " + formatTwoDecimals(aircraft.getMachNumber()), x, y - 80);
+        font.draw(batch, "Acceleration: " + formatOneDecimal(aircraft.getVerticalAcceleration()) + " g", x, y - 100);
     }
 }

@@ -1,5 +1,6 @@
 package io.github.example.UIComponents;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -26,7 +27,8 @@ public class ThrottleDataUI extends FlightDataUI {
         font.draw(batch, (autoThrottle ? "Autothrottle: " : "Throttle: ") + engine.getThrottle() + "%",
                 autoThrottle ? x - 60 : x - 50, y - 50);
 
-        if (autoThrottle){
+        if (autoThrottle) {
+            font.setColor(Color.MAGENTA);
             font.draw(batch, Math.round(autoPilot.getSetAirspeed() * UnitConversionUtils.getMps2Knts()) + " knts", x - 60, y - 70);
         }
     }

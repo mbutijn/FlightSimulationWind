@@ -69,6 +69,7 @@ public class FlightSimulation extends ApplicationAdapter implements InputProcess
         angleOfAttackDataUI = new AngleOfAttackDataUI(aircraft, uiViewport, shape, batch, 100, 75);
         ElevatorDataUI elevatorDataUI = new ElevatorDataUI(aircraft, uiViewport, shape, batch, 300, 75);
         SpeedDataUI speedDataUI = new SpeedDataUI(aircraft, uiViewport, shape, batch, 20, 0.5f * uiViewport.getWorldHeight() - 160);
+        BrakeDataUI brakeDataUI = new BrakeDataUI(aircraft, uiViewport, shape, batch, uiViewport.getWorldWidth() - 70, 35);
         steeringModeDataUI = new SteeringModeDataUI(aircraft, uiViewport, shape, batch, 0.5f * uiViewport.getWorldWidth() - 100f, 0.75f * uiViewport.getWorldHeight());
         AirPropertiesDataUI airPropertiesDataUI = new AirPropertiesDataUI(aircraft, uiViewport, shape, batch, uiViewport.getWorldWidth() - 120, uiViewport.getWorldHeight() - 50);
         airPropertiesDataUI.setAir(air);
@@ -91,6 +92,7 @@ public class FlightSimulation extends ApplicationAdapter implements InputProcess
         uiComponents.add(climbRateDataUI);
         uiComponents.add(airPropertiesDataUI);
         uiComponents.add(speedDataUI);
+        uiComponents.add(brakeDataUI);
         uiComponents.add(steeringModeDataUI);
         uiComponents.add(pitchAngleDataUI);
 
@@ -336,7 +338,7 @@ public class FlightSimulation extends ApplicationAdapter implements InputProcess
     }
 
 
-    public static SteeringMode getSteeringMode(){
+    public static SteeringMode getSteeringMode() {
         return steeringMode;
     }
 }

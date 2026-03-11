@@ -92,10 +92,10 @@ public class PitchAngleDataUI extends FlightDataUI {
         shape.rectLine(x1, middleHeight, x1, middleHeight - 5, 2);
         shape.rectLine(x2, middleHeight, x2, middleHeight - 5, 2);
 
-        if (autoPilot){
+        if (autoPilot) {
             float difference = pitchAngle - aircraft.getAutoPilot().getSetPitchAngle();
             if (difference > -limit && difference < limit) {
-                shape.setColor(Color.RED);
+                shape.setColor(Color.MAGENTA);
                 float setPitchAngle = middleHeight - difference * heightPerDegree;
                 shape.rectLine(x - 10, setPitchAngle, x, setPitchAngle, 2);
                 shape.rectLine(xRight, setPitchAngle, xRight + 10, setPitchAngle, 2);
@@ -103,7 +103,7 @@ public class PitchAngleDataUI extends FlightDataUI {
         }
     }
 
-    public void writeValues(){
+    public void writeValues() {
         int pitchAngleInt = Math.round(aircraft.getPitchAngle());
         int limit = 30;
         float heightPerDegree = height / (2 * limit); // = 2

@@ -70,6 +70,7 @@ public class Aircraft {
     }
 
     public void update(float timeStep) {
+        wing.updateWind(position.y);
         air.updateProperties(position.y);
 
         wing.updateAerodynamics(air, Cm_deltaE); // update Aerodynamic forces and moment
@@ -150,19 +151,25 @@ public class Aircraft {
         this.pitchAngle = 3; // -15
         this.pitchRate = 0; // 0
         this.pitchAcceleration = 0; // 0
+        this.climbRate = 0; // 0
+        this.pitchMoment = 0; // 0
+        this.Cm_deltaE = 0; // 0
 
         if (this.autoPilot != null) {
             autoPilot.pitchController.resetErrorIntegral();
             autoPilot.altitudeController.resetErrorIntegral();
             autoPilot.verticalSpeedController.resetErrorIntegral();
         }
+        if (gear != null) {
+            gear.reset();
+        }
     }
 
-    public Vector2 getPosition(){
+    public Vector2 getPosition() {
         return position;
     }
 
-    public void moveElevatorFromMousePosition(int yPosition){
+    public void moveElevatorFromMousePosition(int yPosition) {
         float up = 668;
         float down = 100;
         float minValue = -1f;
@@ -181,43 +188,43 @@ public class Aircraft {
         ElevatorDataUI.setDeflection(Cm_deltaE);
     }
 
-    public void setCm_deltaE(float Cm_deltaE){
+    public void setCm_deltaE(float Cm_deltaE) {
         this.Cm_deltaE = Cm_deltaE;
     }
 
-    public float getSpeed(){
+    public float getSpeed() {
         return velocity.len();
     }
 
-    public Vector2 getVelocity(){
+    public Vector2 getVelocity() {
         return velocity;
     }
 
-    public float getPitchAngle(){
+    public float getPitchAngle() {
         return pitchAngle;
     }
 
-    public float getWeight(){
+    public float getWeight() {
         return weight.len();
     }
 
-    public Vector2 getAcceleration(){
+    public Vector2 getAcceleration() {
         return acceleration;
     }
 
-    public float getPitchRate(){
+    public float getPitchRate() {
         return pitchRate;
     }
 
-    public AutoPilot getAutoPilot(){
+    public AutoPilot getAutoPilot() {
         return autoPilot;
     }
 
-    public float getClimbRate(){
+    public float getClimbRate() {
         return climbRate;
     }
 
-    public Air getAir(){
+    public Air getAir() {
         return air;
     }
 
@@ -232,11 +239,11 @@ public class Aircraft {
         return (float) Math.sqrt(2 * weight.len() / (getAir().getDensity() * wing.getArea() * 1.45f));
     }
 
-    public float getMachNumber(){
+    public float getMachNumber() {
         return wing.getTrueAirspeed() / getAir().speedOfSound;
     }
 
-    public float getVerticalAcceleration(){
+    public float getVerticalAcceleration() {
         return getAcceleration().y / 9.807f + 1;
     }
 
@@ -252,25 +259,25 @@ public class Aircraft {
         return gear;
     }
 
-    public void renderCenterOfGravity(ShapeRenderer shape){
+    public void renderCenterOfGravity(ShapeRenderer shape) {
 //        shape.circle(position.x, position.y, 0.1f, 20);
 //        shape.circle(sprite.getOriginX(), sprite.getOriginY(), 0.1f, 20);
         shape.circle(sprite.getX() + cgPosition.x * sprite.getWidth(), sprite.getY() + cgPosition.y * sprite.getHeight(), 0.1f, 20);
     }
 
-    public Sprite getSprite(){
+    public Sprite getSprite() {
         return sprite;
     }
 
-    public Vector2 getCgPosition(){
+    public Vector2 getCgPosition() {
         return cgPosition;
     }
 
-    public Engine getEngine(){
+    public Engine getEngine() {
         return engine;
     }
 
-    public Wing getWing(){
+    public Wing getWing() {
         return wing;
     }
 
@@ -278,7 +285,7 @@ public class Aircraft {
         this.pitchMoment = pitchMoment;
     }
 
-    public boolean isMovingForward(){
+    public boolean isMovingForward() {
         return velocity.x > 0;
     }
 }

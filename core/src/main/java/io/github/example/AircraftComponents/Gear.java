@@ -69,4 +69,8 @@ public class Gear {
     public boolean bothWheelsOnGround(){
         return frontWheel.isOnGround() && rearWheel.isOnGround();
     }
+
+    public boolean isBraking() {
+        return bothWheelsOnGround() && brakeCommand == BrakeCommand.BRAKE;
+    }
 }

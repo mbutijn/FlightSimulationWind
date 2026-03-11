@@ -15,11 +15,11 @@ public class Wing {
     private final float chordLength = Config.getFloat("aircraft1.chordLength");
     private float angleOfAttack, airspeed, indicatedAirspeed, drag, flightPathAngle;
 
-    public Wing(Aircraft aircraft){
+    public Wing(Aircraft aircraft) {
         this.aircraft = aircraft;
         this.area = Config.getFloat("aircraft1.wingArea"); // wing surface area [m²]
         this.aerodynamicForce = new Vector2(0, 0);
-        this.wind = new Vector2(-20, 0); // -20, 0
+        this.wind = new Vector2(0, 0); // -20, 0
 
         // Initialize aerodynamic coefficients
         Cl = new AerodynamicCoefficient(new float[]{-180, -90, -30, -20, -10, 0, 8, 10, 12, 15, 18, 21, 26, 32, 60, 90, 135, 180},
@@ -50,15 +50,20 @@ public class Wing {
         aerodynamicForce.rotateDeg(flightPathAngle); // put in airspeed frame
     }
 
+    public void updateWind(float height) {
+        float startHeight = 3;
+        wind.x = height > 100 + startHeight ? -20 : height < startHeight ? 0 : -0.2f * (height - startHeight);
+    }
+
     public AerodynamicCoefficient getCl() {
         return Cl;
     }
 
-    public AerodynamicCoefficient getCd(){
+    public AerodynamicCoefficient getCd() {
         return Cd;
     }
 
-    public AerodynamicCoefficient getCm(){
+    public AerodynamicCoefficient getCm() {
         return Cm;
     }
 
@@ -70,11 +75,15 @@ public class Wing {
         return aerodynamicForce;
     }
 
-    public float getAngleOfAttack(){
-        return angleOfAttack;
+    public Vector2 getWind() {
+        return wind;
     }
 
-    public float getDrag(){
+    public float getAngleOfAttack() {
+        return aircraft.getVelocity().len() > 1 ? angleOfAttack : 0;
+    }
+
+    public float getDrag() {
         return drag;
     }
 
@@ -82,11 +91,11 @@ public class Wing {
         return Math.toRadians(flightPathAngle);
     }
 
-    public float getTrueAirspeed(){
+    public float getTrueAirspeed() {
         return airspeed;
     }
 
-    public float getIndicatedAirspeed(){
+    public float getIndicatedAirspeed() {
         return indicatedAirspeed;
     }
 

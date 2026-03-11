@@ -15,7 +15,7 @@ public class DataTape extends FlightDataUI {
         super(aircraft, viewport, shape, batch, x, y);
     }
 
-    public void setProperties(int bound, float pixelSpacing, float spacing){
+    public void setProperties(int bound, float pixelSpacing, float spacing) {
         this.bound = bound;
         this.pixelSpacing = pixelSpacing;
         this.spacing = spacing;
@@ -50,7 +50,7 @@ public class DataTape extends FlightDataUI {
         if (drawSetValue) {
             float difference = value - setValue;
             if (difference > -bound && difference < bound) {
-                shape.setColor(Color.RED);
+                shape.setColor(Color.MAGENTA);
                 float setAltitude = center - difference * pixelSpacing;
                 shape.rectLine(x + 20, setAltitude, x + 30, setAltitude, 2);
                 shape.setColor(FlightDataUI.color);
@@ -58,14 +58,14 @@ public class DataTape extends FlightDataUI {
         }
     }
 
-    public void drawStaticPart(){
+    public void drawStaticPart() {
         float xBar = x + 20;
         shape.rectLine(xBar, under, xBar, upper, 2); // static elements
         shape.rectLine(xBar, center, xBar - 15, center - 15, 2);
         shape.rectLine(xBar, center, xBar - 15, center + 15, 2);
     }
 
-    public void writeValues(float value){
+    public void writeValues(float value) {
         float xBarEnd = x + 40;
         int currentValue = Math.round(value);
 
@@ -88,12 +88,12 @@ public class DataTape extends FlightDataUI {
         }
     }
 
-    public void drawRegion(float borderSpeed, float airspeed, Color color){
+    public void drawRegion(float borderSpeed, float airspeed, Color color) {
         float lowerBound = airspeed - bound;
         float upperBound = airspeed + bound;
         float xPosition = x + 15;
 
-        if (lowerBound < borderSpeed){
+        if (lowerBound < borderSpeed) {
             shape.setColor(color);
             float barHeigth = borderSpeed - lowerBound;
             if (upperBound < borderSpeed){

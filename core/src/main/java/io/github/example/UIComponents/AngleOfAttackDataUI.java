@@ -28,23 +28,28 @@ public class AngleOfAttackDataUI extends FlightDataUI {
 
         arcPositions = new Array<>();
         float radius = 60;
-        for (int angle = -15; angle <= 30; angle += 5){
+        for (int angle = -15; angle <= 30; angle += 5) {
             arcPositions.add(new Vector2(x + (float) (radius * Math.cos(Math.toRadians(angle))),
                     y + (float) (radius * Math.sin(Math.toRadians(angle)))));
         }
     }
 
     public void writeValues() {
-        font.draw(batch, "AoA: " + formatOneDecimal(aircraft.getWing().getAngleOfAttack()) + " deg", x - 40, y - 40);
+        float angleOfAttack = aircraft.getWing().getAngleOfAttack();
+        if (angleOfAttack > 20 || angleOfAttack < -10) {
+            font.setColor(Color.RED);
+        }
+        font.draw(batch, "AoA: " + formatOneDecimal(angleOfAttack) + " deg", x - 40, y - 40);
+        font.setColor(FlightDataUI.color);
     }
 
-    public void draw(){
+    public void draw() {
         shape.setColor(color);
         indicator.setRotation(aircraft.getWing().getAngleOfAttack());
         shape.polygon(indicator.getTransformedVertices());
     }
 
-    public void drawStaticPart(){
+    public void drawStaticPart() {
         shape.setColor(Color.GREEN); // normal angle of attack
         for (int i = 1; i < arcPositions.size - 2; i++){
             shape.rectLine(arcPositions.get(i - 1), arcPositions.get(i), 4); // -15 -> 15
@@ -53,8 +58,9 @@ public class AngleOfAttackDataUI extends FlightDataUI {
         shape.setColor(Color.YELLOW); // caution
         shape.rectLine(arcPositions.get(6), arcPositions.get(7), 4); // 15 -> 20
 
-        shape.setColor(Color.RED); // stall
+        shape.setColor(Color.ORANGE); // stall
         shape.rectLine(arcPositions.get(7), arcPositions.get(8), 4); // 20 -> 25
+        shape.setColor(Color.RED); // deep stall
         shape.rectLine(arcPositions.get(8), arcPositions.get(9), 4); // 25 -> 30
     }
 }
