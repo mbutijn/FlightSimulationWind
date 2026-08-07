@@ -18,6 +18,7 @@ public abstract class FlightDataUI {
     public static float deflection;
     protected float x, y, width, height;
     public static Color color;
+    public static Color warning;
 
     public FlightDataUI(Aircraft aircraft, Viewport viewport, ShapeRenderer shape, SpriteBatch batch, float x, float y) {
         this.aircraft = aircraft;
@@ -27,9 +28,10 @@ public abstract class FlightDataUI {
         this.x = x;
         this.y = y;
         updateUIColor(aircraft.getPosition().y);
+        warning = new Color(1f, 0.2f, 0.2f, 1f);
     }
 
-    public static void updateUIColor(float height){
+    public static void updateUIColor(float height) {
         color = height > 1500 ? Color.WHITE : Color.BLACK;
         font.setColor(color);
     }
@@ -50,17 +52,17 @@ public abstract class FlightDataUI {
         return height;
     }
 
-    public boolean mouseAboveUI(float xMouse, float yMouse){
+    public boolean mouseAboveUI(float xMouse, float yMouse) {
         return xMouse > x && xMouse < x + this.width && yMouse > y && yMouse < y + this.height;
     }
 
-    public void writeValues(){
+    public void writeValues() {
     }
 
-    public void draw(){
+    public void draw() {
     }
 
-    public void writeValues(float value){
+    public void writeValues(float value) {
     }
 
     public static String formatOneDecimal(float value) {
@@ -68,7 +70,7 @@ public abstract class FlightDataUI {
         return out.contains(".") ? out : out + ".0";
     }
 
-    public static String formatTwoDecimals(float value){
+    public static String formatTwoDecimals(float value) {
         float numberTimesHundred = Math.round(100 * value);
         String out = "" + numberTimesHundred / 100f;
         if (numberTimesHundred % 10 == 0){

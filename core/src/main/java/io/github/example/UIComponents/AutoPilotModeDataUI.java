@@ -115,7 +115,7 @@ public class AutoPilotModeDataUI extends FlightDataUI {
                 if (autoPilot.isClimbAndHold()) {
                     mode = "CLH";
                     if (setClimbRate != 0 && (autoPilot.getSetAltitude() < aircraft.getPosition().y == setClimbRate > 0)) {
-                        font.setColor(Color.RED);
+                        font.setColor(FlightDataUI.warning);
                     }
                     font.draw(batch, Math.round(autoPilot.getSetAltitude() * UnitConversionUtils.getM2Feet()) + " feet", x, y + 160);
                 } else {

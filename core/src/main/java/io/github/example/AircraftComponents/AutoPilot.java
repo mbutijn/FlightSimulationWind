@@ -19,7 +19,7 @@ public class AutoPilot {
     private final Wing wing;
     public PIDController pitchController, verticalSpeedController, altitudeController;
 
-    public AutoPilot (Aircraft aircraft){
+    public AutoPilot (Aircraft aircraft) {
         this.aircraft = aircraft;
         this.wing = aircraft.getWing();
         this.mode = AutoPilotMode.PITCH_HOLD;
@@ -33,9 +33,11 @@ public class AutoPilot {
         this.altitudeController = new PIDController(0.2f, 0.0f, -0.05f, -4, 4);
     }
 
-    public void calculateElevatorDeflection(){
+    public void calculateElevatorDeflection() {
         float Cm_deltaE = 0;
         float altitude = aircraft.getPosition().y;
+        float threshold = 5 + Math.abs(setClimbRate * 1.96850393701f);
+
         if (this.mode == AutoPilotMode.PITCH_HOLD) {
             pitchController.updateValues(setPitchAngle, aircraft.getPitchAngle(), aircraft.getPitchRate());
             Cm_deltaE = pitchController.calculateOutput();
@@ -43,7 +45,7 @@ public class AutoPilot {
             verticalSpeedController.updateValues(setClimbRate, aircraft.getClimbRate(), aircraft.getAcceleration().y);
             Cm_deltaE = verticalSpeedController.calculateOutput();
 
-            if (climbAndHold && Math.abs(setAltitude - altitude) < 20){
+            if (climbAndHold && Math.abs(setAltitude - altitude) < threshold) {
                 aircraft.getAutoPilot().setMode(AutoPilotMode.ALTITUDE_HOLD);
             }
         } else if (mode == AutoPilotMode.ALTITUDE_HOLD) {
@@ -52,7 +54,7 @@ public class AutoPilot {
             verticalSpeedController.updateValues(setClimb, aircraft.getClimbRate(), aircraft.getAcceleration().y);
             Cm_deltaE = verticalSpeedController.calculateOutput();
 
-            if (Math.abs(setAltitude - altitude) > 20){
+            if (Math.abs(setAltitude - altitude) > threshold){
                 climbAndHold = true;
                 aircraft.getAutoPilot().setMode(AutoPilotMode.VERTICAL_SPEED);
             }
@@ -62,7 +64,7 @@ public class AutoPilot {
         ElevatorDataUI.setDeflection(Cm_deltaE); // multiply with -25 degrees per C_m
     }
 
-    public void changeSetPitchAngle(float amount){
+    public void changeSetPitchAngle(float amount) {
         setPitchAngle -= amount;
         setPitchAngle = MathUtils.putInDomain(setPitchAngle);
     }
@@ -152,5 +154,11 @@ public class AutoPilot {
 
     public boolean isClimbAndHold() {
         return climbAndHold;
+    }
+
+    public void reset () {
+        pitchController.reset();
+        altitudeController.reset();
+        verticalSpeedController.reset();
     }
 }

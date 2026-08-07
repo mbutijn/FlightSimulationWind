@@ -39,7 +39,7 @@ public class Wing {
         angleOfAttack = MathUtils.putInDomain(aircraft.getPitchAngle() - flightPathAngle);
 
         float dynamicPressure = 0.5f * air.getDensity() * windRelativeToAircraft.len2();
-        float totalCm = Cm.calculateCoefficient(angleOfAttack) -0.007f * aircraft.getPitchRate() + Cm_deltaE; // pitch moment coefficient
+        float totalCm = Cm.calculateCoefficient(angleOfAttack) - 0.07f * aircraft.getPitchRate() + Cm_deltaE; // pitch moment coefficient
 
         aircraft.setPitchMoment(totalCm * dynamicPressure * area * chordLength); // pitch moment
 
@@ -97,6 +97,10 @@ public class Wing {
 
     public float getIndicatedAirspeed() {
         return indicatedAirspeed;
+    }
+
+    public void reset() {
+        angleOfAttack = 0;
     }
 
 }

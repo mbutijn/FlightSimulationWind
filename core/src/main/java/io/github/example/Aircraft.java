@@ -140,11 +140,14 @@ public class Aircraft {
     public void reset() {
         System.out.println("reset");
 
-        this.position = new Vector2(0, 50 / UnitConversionUtils.getM2Feet()); // 0, 2500 (service ceiling = 4267.2f)
-        this.velocity = new Vector2(35, -3); // 55, 0
+        this.position = new Vector2(0, 2500 / UnitConversionUtils.getM2Feet()); // 0, 2500 (service ceiling = 4267.2f)
+        this.velocity = new Vector2(35, 0); // 55, 0
         this.acceleration = new Vector2(0, 0);
         this.engine.reset();
+        this.wing.reset();
 
+        this.air.updateProperties(position.y);
+        this.wing.updateAerodynamics(air, 0);
         this.resultantForce = new Vector2(0, 0);
 
         // angle dynamics
@@ -156,9 +159,7 @@ public class Aircraft {
         this.Cm_deltaE = 0; // 0
 
         if (this.autoPilot != null) {
-            autoPilot.pitchController.resetErrorIntegral();
-            autoPilot.altitudeController.resetErrorIntegral();
-            autoPilot.verticalSpeedController.resetErrorIntegral();
+            autoPilot.reset();
         }
         if (gear != null) {
             gear.reset();

@@ -12,7 +12,7 @@ public class Wheel {
     private float previousDisplacement;
     private boolean onGround;
 
-    public Wheel(Aircraft aircraft, float x, float y, float stiffness, float damping){
+    public Wheel(Aircraft aircraft, float x, float y, float stiffness, float damping) {
         this.aircraft = aircraft;
         this.position = new Vector2(x, y);
         this.reactionForce = new Vector2(0, 0);
@@ -23,7 +23,7 @@ public class Wheel {
         this.onGround = false;
     }
 
-    public void updateReactionForceAndMoment(float dt, boolean isBraking){
+    public void updateReactionForceAndMoment(float dt, boolean isBraking) {
         position.setAngleDeg(aircraft.getPitchAngle() + angle);
 
         float displacement = position.y + aircraft.getPosition().y;
@@ -47,16 +47,17 @@ public class Wheel {
         }
     }
 
-    public Vector2 getReactionForce(){
+    public Vector2 getReactionForce() {
         return reactionForce;
     }
 
-    public float getMoment(){
+    public float getMoment() {
         return moment;
     }
 
     public void reset() {
         reactionForce.setZero();
+        moment = 0;
     }
 
     public boolean isOnGround() {

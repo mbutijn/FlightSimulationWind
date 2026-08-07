@@ -15,7 +15,7 @@ public class Air {
     float pressure; // air pressure (Pa)
     float speedOfSound; // speed of sound (m/s)
 
-    public Air(){
+    public Air() {
         this.constant1 = L / T0;
         this.constant2 = (g * M) / (R * L);
     }
@@ -28,7 +28,7 @@ public class Air {
         speedOfSound = (float) Math.sqrt(gamma * R * temperature / M);
     }
 
-    public float getDensity(){
+    public float getDensity() {
         return density;
     }
 
@@ -36,23 +36,23 @@ public class Air {
         return temperature;
     }
 
-    public float getPressure(){
+    public float getPressure() {
         return pressure;
     }
 
-    public float getRho0(){
+    public float getRho0() {
         return rho0;
     }
 
-    public float getSpeedOfSound(){
+    public float getSpeedOfSound() {
         return speedOfSound;
     }
 
-    public float getDensityRatio(){
+    public float getDensityRatio() {
         return density / rho0;
     }
 
-    public float getInvertedDensityRatio(){
+    public float getInvertedDensityRatio() {
         return rho0 / density;
     }
 }

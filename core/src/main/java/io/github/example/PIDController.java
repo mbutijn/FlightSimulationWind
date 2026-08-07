@@ -37,6 +37,12 @@ public class PIDController {
         return Math.min(output, maxValue);
     }
 
+    public void reset() {
+        error = 0;
+        errorDot = 0;
+        errorIntegral = 0;
+    }
+
     public void resetErrorIntegral() {
         this.errorIntegral = 0;
     }
