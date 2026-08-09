@@ -17,9 +17,9 @@ public abstract class FlightDataUI {
     protected final Viewport viewport;
     public static float deflection;
     protected float x, y, width, height;
-    public static Color color;
-    public static Color warning;
-    public static Color achievedValue;
+    public static Color standardColor;
+    public static Color warningColor;
+    public static Color achievedValueColor;
 
     public FlightDataUI(Aircraft aircraft, Viewport viewport, ShapeRenderer shape, SpriteBatch batch, float x, float y) {
         this.aircraft = aircraft;
@@ -28,14 +28,14 @@ public abstract class FlightDataUI {
         this.viewport = viewport;
         this.x = x;
         this.y = y;
-        warning = new Color(1f, 0.2f, 0.2f, 1f);
-        achievedValue = new Color(0.1f, 0.7f, 0.2f, 1f);
+        warningColor = new Color(1f, 0.2f, 0.2f, 1f);
+        achievedValueColor = new Color(0.1f, 0.7f, 0.2f, 1f);
         updateUIColor(aircraft.getPosition().y);
     }
 
     public static void updateUIColor(float height) {
-        color = height > 1500 ? Color.WHITE : Color.BLACK;
-        font.setColor(color);
+        standardColor = height > 1500 ? Color.WHITE : Color.BLACK;
+        font.setColor(standardColor);
     }
 
     public float getX(){

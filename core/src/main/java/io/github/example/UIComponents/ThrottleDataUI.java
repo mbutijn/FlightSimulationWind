@@ -21,15 +21,16 @@ public class ThrottleDataUI extends FlightDataUI {
         this.engine = aircraft.getEngine();
     }
 
-    public void writeValues(){
+    public void writeValues() {
         AutoPilot autoPilot = aircraft.getAutoPilot();
         boolean autoThrottle = FlightSimulation.getSteeringMode() == SteeringMode.AUTO_PILOT && autoPilot.getAutoThrottle();
         font.draw(batch, (autoThrottle ? "Autothrottle: " : "Throttle: ") + engine.getThrottle() + "%",
                 autoThrottle ? x - 60 : x - 50, y - 50);
 
         if (autoThrottle) {
-            font.setColor(Color.MAGENTA);
-            font.draw(batch, Math.round(autoPilot.getSetAirspeed() * UnitConversionUtils.getMps2Knts()) + " knts", x - 60, y - 70);
+            float setAirspeed = autoPilot.getSetAirspeed();
+            font.setColor(autoPilot.speedIsCloseToSetValue() ? achievedValueColor : Color.MAGENTA);
+            font.draw(batch, Math.round(UnitConversionUtils.convertMps2Knts(setAirspeed)) + " knts", x - 60, y - 70);
         }
     }
 

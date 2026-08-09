@@ -1,5 +1,6 @@
 package io.github.example.AircraftComponents;
 
+import com.badlogic.gdx.graphics.Color;
 import io.github.example.Aircraft;
 import io.github.example.AutoPilotMode;
 import io.github.example.PIDController;
@@ -99,7 +100,7 @@ public class AutoPilot {
     }
 
     public void changeSetClimbRate(float amount, boolean coarseTuning) {
-        setClimbRate -= ((coarseTuning ? 100 : 10) * amount / UnitConversionUtils.getMps2Feetpmin());
+        setClimbRate -=  UnitConversionUtils.convertFeetpmin2Mps(((coarseTuning ? 100 : 10) * amount));
     }
 
     public float getSetClimbRate(){
@@ -107,7 +108,7 @@ public class AutoPilot {
     }
 
     public void changeSetAltitude(float amount, boolean coarseTuning) {
-        setAltitude -= (coarseTuning ? 100 : 10) * amount / UnitConversionUtils.getM2Feet();
+        setAltitude -= (coarseTuning ? 100 : 10) * UnitConversionUtils.convertFeet2M(amount);
     }
 
     public void setSetAltitude(float setAltitude) {
@@ -136,12 +137,12 @@ public class AutoPilot {
 
     public void toggleAutoThrottle() {
         autoThrottle = !autoThrottle;
-        this.setAirspeed = Math.round(wing.getTrueAirspeed() / UnitConversionUtils.getMps2Knts()) * UnitConversionUtils.getMps2Knts();
+        this.setAirspeed = wing.getTrueAirspeed();
         System.out.println("Auto throttle: " + autoThrottle);
     }
 
     public void changeSetAirspeed(float amount) {
-        setAirspeed -= amount / UnitConversionUtils.getMps2Knts();
+        setAirspeed -= UnitConversionUtils.convertKnts2Mps(amount);
     }
 
     public float getSetAirspeed() {
@@ -160,5 +161,29 @@ public class AutoPilot {
         pitchController.reset();
         altitudeController.reset();
         verticalSpeedController.reset();
+    }
+
+    public boolean speedIsCloseToSetValue() {
+        return Math.abs(setAirspeed - aircraft.getWing().getTrueAirspeed()) < UnitConversionUtils.convertKnts2Mps(1);
+    }
+
+    public boolean altitudeIsCloseToSetValue() {
+        return Math.abs(altitudeController.getDifference()) < UnitConversionUtils.convertFeet2M(1);
+    }
+
+    public boolean manualAltitudeIsCloseToSetValue() {
+        return Math.abs(setAltitude - aircraft.getCgPosition().y) < UnitConversionUtils.convertFeet2M(1);
+    }
+
+    public boolean pitchAngleIsCloseToSetValue() {
+        return Math.abs(pitchController.getDifference()) < 1;
+    }
+
+    public boolean climbRateIsCloseToSetValue() {
+        return Math.abs(verticalSpeedController.getDifference()) < UnitConversionUtils.convertFeetpmin2Mps(50);
+    }
+
+    public boolean unableToReachSetAltitude() {
+        return setClimbRate != 0 && (getSetAltitude() < aircraft.getPosition().y == setClimbRate > 0);
     }
 }

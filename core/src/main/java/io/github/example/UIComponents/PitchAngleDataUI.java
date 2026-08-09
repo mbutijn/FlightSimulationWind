@@ -48,7 +48,7 @@ public class PitchAngleDataUI extends FlightDataUI {
                 shape.rect(x, y, width, groundHeight);
             }
         } else { // when the aircraft is upside down
-            if (pitchAngle > 0){
+            if (pitchAngle > 0) {
                 skyHeight = (limit + 180 - pitchAngle) * heightPerDegree;
                 groundHeight = (limit - 180 + pitchAngle) * heightPerDegree;
             } else {
@@ -95,7 +95,7 @@ public class PitchAngleDataUI extends FlightDataUI {
         if (autoPilot) {
             float difference = pitchAngle - aircraft.getAutoPilot().getSetPitchAngle();
             if (difference > -limit && difference < limit) {
-                shape.setColor(Color.MAGENTA);
+                shape.setColor(aircraft.getAutoPilot().pitchAngleIsCloseToSetValue() ? FlightDataUI.achievedValueColor : Color.MAGENTA);
                 float setPitchAngle = middleHeight - difference * heightPerDegree;
                 shape.rectLine(x - 10, setPitchAngle, x, setPitchAngle, 2);
                 shape.rectLine(xRight, setPitchAngle, xRight + 10, setPitchAngle, 2);
@@ -115,7 +115,7 @@ public class PitchAngleDataUI extends FlightDataUI {
                 font.draw(batch, layout, middleWidth - 0.5f * layout.width, middleHeight + (i - pitchAngleInt) * heightPerDegree + 0.5f * layout.height);
             }
         }
-        font.setColor(FlightDataUI.color);
+        font.setColor(FlightDataUI.standardColor);
     }
 
 }

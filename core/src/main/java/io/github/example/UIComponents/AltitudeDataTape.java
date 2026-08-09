@@ -43,10 +43,10 @@ public class AltitudeDataTape extends DataTape {
         if (drawSetValue) {
             float difference = value - setValue;
             if (difference > -bound && difference < bound) {
-                shape.setColor(Color.MAGENTA);
+                shape.setColor(aircraft.getAutoPilot().altitudeIsCloseToSetValue() ? FlightDataUI.achievedValueColor : Color.MAGENTA);
                 float setAltitude = center - difference * pixelSpacing;
                 shape.rectLine(x + 20, setAltitude, x + 30, setAltitude, 2);
-                shape.setColor(FlightDataUI.color);
+                shape.setColor(FlightDataUI.standardColor);
             }
         }
     }

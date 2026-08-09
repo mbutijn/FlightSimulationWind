@@ -35,10 +35,10 @@ public class SpeedDataTape extends DataTape {
         if (drawSetValue) {
             float difference = value - setValue;
             if (difference > -bound && difference < bound) {
-                shape.setColor(Color.MAGENTA);
+                shape.setColor(aircraft.getAutoPilot().speedIsCloseToSetValue() ? achievedValueColor : Color.MAGENTA);
                 float setAltitude = center - difference * pixelSpacing;
                 shape.rectLine(x + width - 20, setAltitude, x + width - 30, setAltitude, 2);
-                shape.setColor(FlightDataUI.color);
+                shape.setColor(FlightDataUI.standardColor);
             }
         }
     }
@@ -61,7 +61,7 @@ public class SpeedDataTape extends DataTape {
 
     public void drawStallRegionsWarning(float stallSpeed) {
         if (!aircraft.getGear().bothWheelsOnGround()) {
-            float airspeed = aircraft.getWing().getTrueAirspeed() * UnitConversionUtils.getMps2Knts();
+            float airspeed = UnitConversionUtils.convertMps2Knts(aircraft.getWing().getTrueAirspeed());
             drawRegion(stallSpeed, airspeed, Color.YELLOW);
             drawRegion(0.9f * stallSpeed, airspeed, Color.RED);
         }

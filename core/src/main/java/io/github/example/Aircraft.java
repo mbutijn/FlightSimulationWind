@@ -140,7 +140,7 @@ public class Aircraft {
     public void reset() {
         System.out.println("reset");
 
-        this.position = new Vector2(0, 250 / UnitConversionUtils.getM2Feet()); // 0, 2500 (service ceiling = 4267.2f)
+        this.position = new Vector2(0, UnitConversionUtils.convertFeet2M(250)); // 0, 2500 (service ceiling = 4267.2f)
         this.velocity = new Vector2(35, 0); // 55, 0
         this.acceleration = new Vector2(0, 0);
         this.engine.reset();
@@ -193,7 +193,7 @@ public class Aircraft {
         this.Cm_deltaE = Cm_deltaE;
     }
 
-    public float getSpeed() {
+    public float getGroundSpeed() {
         return velocity.len();
     }
 

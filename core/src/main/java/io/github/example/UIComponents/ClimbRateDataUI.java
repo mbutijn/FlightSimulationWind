@@ -20,7 +20,7 @@ public class ClimbRateDataUI extends FlightDataUI {
     }
 
     public void writeValues(){
-        font.draw(batch, "Climb rate: " + (Math.round(aircraft.getClimbRate() * UnitConversionUtils.getMps2Feetpmin())) + " feet/min", x - 80, y - 50);
+        font.draw(batch, "Climb rate: " + (Math.round(UnitConversionUtils.getMps2Feetpmin(aircraft.getClimbRate()))) + " feet/min", x - 80, y - 50);
         font.draw(batch, "up", x - radius + 4, y + 17);
         font.draw(batch, "down", x - radius + 4, y - 5);
     }
@@ -40,7 +40,8 @@ public class ClimbRateDataUI extends FlightDataUI {
     }
 
     public void drawSetValue() {
-        shape.setColor(Color.MAGENTA);
+        //shape.setColor(Color.MAGENTA);
+        shape.setColor(aircraft.getAutoPilot().climbRateIsCloseToSetValue() ? FlightDataUI.achievedValueColor : Color.MAGENTA);
         float angleSet = mps2Degree * aircraft.getAutoPilot().getSetClimbRate();
         float cos = (float) Math.cos(Math.toRadians(180 - angleSet));
         float sin = (float) Math.sin(Math.toRadians(180 - angleSet));

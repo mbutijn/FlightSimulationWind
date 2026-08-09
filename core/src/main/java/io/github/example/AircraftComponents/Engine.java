@@ -12,7 +12,7 @@ public class Engine {
     private int throttle;
     private ChangeThrottle changeThrottle;
 
-    public Engine(Aircraft aircraft){
+    public Engine(Aircraft aircraft) {
         this.thrust = new Vector2(0, 0);
         this.aircraft = aircraft;
         this.maxPower = Config.getFloat("aircraft1.maxPower") * Config.getFloat("aircraft1.propEfficiency"); // at sea level
@@ -20,17 +20,17 @@ public class Engine {
         this.changeThrottle = ChangeThrottle.NONE;
     }
 
-    public void update(){
-        if (changeThrottle == ChangeThrottle.DOWN){
+    public void update() {
+        if (changeThrottle == ChangeThrottle.DOWN) {
             throttleDown();
         }
-        if (changeThrottle == ChangeThrottle.UP){
+        if (changeThrottle == ChangeThrottle.UP) {
             throttleUp();
         }
         updateThrust();
     }
 
-    public void updateThrust(){
+    public void updateThrust() {
         thrust.x = throttle * powerPerThrottle * aircraft.getAir().getDensityRatio() / aircraft.getWing().getTrueAirspeed();
         thrust.y = 0;
         thrust.rotateDeg(aircraft.getPitchAngle()); // engine is attached to the vehicle
@@ -61,7 +61,7 @@ public class Engine {
         }
     }
 
-    public int getThrottle(){
+    public int getThrottle() {
         return throttle;
     }
 
@@ -69,7 +69,7 @@ public class Engine {
         return maxPower;
     }
 
-    public void setChangeThrottle(ChangeThrottle change){
+    public void setChangeThrottle(ChangeThrottle change) {
         changeThrottle = change;
     }
 

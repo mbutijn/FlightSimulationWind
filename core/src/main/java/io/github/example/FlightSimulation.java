@@ -111,15 +111,15 @@ public class FlightSimulation extends ApplicationAdapter implements InputProcess
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
             worldViewport.apply();
             shape.begin(ShapeRenderer.ShapeType.Filled);
-            shape.setColor(FlightDataUI.color);
+            shape.setColor(FlightDataUI.standardColor);
             AutoPilot autoPilot = aircraft.getAutoPilot();
-            altitudeTape.drawTape(aircraft.getPosition().y * UnitConversionUtils.getM2Feet(), steeringMode == SteeringMode.AUTO_PILOT && autoPilot.drawSetAltitude(), autoPilot.getSetAltitude() * UnitConversionUtils.getM2Feet());
+            altitudeTape.drawTape(UnitConversionUtils.convertM2Feet(aircraft.getPosition().y), steeringMode == SteeringMode.AUTO_PILOT && autoPilot.drawSetAltitude(), UnitConversionUtils.convertM2Feet(autoPilot.getSetAltitude()));
             altitudeTape.drawStaticPart();
 
             Wing wing = aircraft.getWing();
-            velocityTape.drawTape(wing.getTrueAirspeed() * UnitConversionUtils.getMps2Knts(), steeringMode == SteeringMode.AUTO_PILOT && autoPilot.drawSetAirspeed(), autoPilot.getSetAirspeed() * UnitConversionUtils.getMps2Knts());
-            velocityTape.drawStallRegionsWarning(aircraft.getStallSpeed() * UnitConversionUtils.getMps2Knts());
-            shape.setColor(FlightDataUI.color);
+            velocityTape.drawTape(UnitConversionUtils.convertMps2Knts(wing.getTrueAirspeed()), steeringMode == SteeringMode.AUTO_PILOT && autoPilot.drawSetAirspeed(), UnitConversionUtils.convertMps2Knts(autoPilot.getSetAirspeed()));
+            velocityTape.drawStallRegionsWarning(UnitConversionUtils.convertMps2Knts(aircraft.getStallSpeed()));
+            shape.setColor(FlightDataUI.standardColor);
             velocityTape.drawStaticPart();
             angleOfAttackDataUI.drawStaticPart();
             pitchAngleDataUI.draw(steeringMode == SteeringMode.AUTO_PILOT && autoPilot.getMode() == AutoPilotMode.PITCH_HOLD);
@@ -161,8 +161,8 @@ public class FlightSimulation extends ApplicationAdapter implements InputProcess
             for (FlightDataUI flightDataUI : uiComponents){
                 flightDataUI.writeValues();
             }
-            altitudeTape.writeValues(aircraft.getPosition().y * UnitConversionUtils.getM2Feet());
-            velocityTape.writeValues(wing.getTrueAirspeed() * UnitConversionUtils.getMps2Knts());
+            altitudeTape.writeValues(UnitConversionUtils.convertM2Feet(aircraft.getPosition().y));
+            velocityTape.writeValues(UnitConversionUtils.convertMps2Knts(wing.getTrueAirspeed()));
             steeringModeDataUI.writeSteeringMode(steeringMode);
 
             batch.end();
@@ -228,17 +228,17 @@ public class FlightSimulation extends ApplicationAdapter implements InputProcess
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         if (button == 0) {
-            if (steeringMode == SteeringMode.MOUSE_CONTROL){
+            if (steeringMode == SteeringMode.MOUSE_CONTROL) {
                 steeringMode = SteeringMode.AUTO_PILOT;
                 steeringModeDataUI.reset();
-            } else if (steeringMode == SteeringMode.AUTO_PILOT){
+            } else if (steeringMode == SteeringMode.AUTO_PILOT) {
                 AutoPilot autoPilot = aircraft.getAutoPilot();
                 float y = uiViewport.getWorldHeight() - screenY;
-                if (autoPilotModeDataUI.mouseAboveUI(screenX, y)){
+                if (autoPilotModeDataUI.mouseAboveUI(screenX, y)) {
                     autoPilot.setMode(AutoPilotMode.VERTICAL_SPEED);
                     autoPilot.toggleClimbAndHold();
                     autoPilot.verticalSpeedController.resetErrorIntegral();
-                } else if (pitchAngleDataUI.mouseAboveUI(screenX, y)){
+                } else if (pitchAngleDataUI.mouseAboveUI(screenX, y)) {
                     autoPilot.setMode(AutoPilotMode.PITCH_HOLD);
                     autoPilot.pitchController.resetErrorIntegral();
                 } else if (climbRateDataUI.mouseAboveUI(screenX + climbRateDataUI.getRadius(), y + climbRateDataUI.getRadius())) {
@@ -296,7 +296,7 @@ public class FlightSimulation extends ApplicationAdapter implements InputProcess
                 autoPilot.setMode(AutoPilotMode.VERTICAL_SPEED);
                 autoPilot.changeSetClimbRate(amountY, true);
             } else if (altitudeTape.mouseAboveUI(xMouse, yMouse)) {
-                autoPilot.changeSetAltitude(amountY, true);
+                autoPilot.changeSetAltitude(amountY, false);
                 autoPilot.setMode(AutoPilotMode.ALTITUDE_HOLD);
             } else if (autoPilotModeDataUI.mouseAboveUI(xMouse, uiViewport.getWorldHeight() - yMouse)) {
                 if (autoPilot.getMode() == AutoPilotMode.PITCH_HOLD){
