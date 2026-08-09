@@ -24,8 +24,8 @@ public class AutoPilotModeDataUI extends FlightDataUI {
         this.autoPilot = aircraft.getAutoPilot();
         this.radius = 10;
         this.xMid = 0.5f * width;
-        this.yCourseButton = 35;
-        this.yFineButton = 105;
+        this.yCourseButton = 65;
+        this.yFineButton = 125;
 
         x_bases = new Array<>();
         y_bases = new Array<>();
@@ -88,7 +88,7 @@ public class AutoPilotModeDataUI extends FlightDataUI {
         }
     }
 
-    public int getSetValue(){
+    public int getSetValue() {
         if (autoPilot.isClimbAndHold()) {
             return Math.round(autoPilot.getSetAltitude() * UnitConversionUtils.getM2Feet());
         } else {
@@ -98,6 +98,7 @@ public class AutoPilotModeDataUI extends FlightDataUI {
 
     public void writeValues() {
         if (FlightSimulation.getSteeringMode() == SteeringMode.AUTO_PILOT) {
+
             font.setColor(Color.MAGENTA);
             AutoPilotMode autoPilotMode = autoPilot.getMode();
             String mode = "";
@@ -108,6 +109,9 @@ public class AutoPilotModeDataUI extends FlightDataUI {
                 mode = "PIT";
                 unit = "deg";
                 setValue = autoPilot.getSetPitchAngle();
+                if (Math.abs(autoPilot.pitchController.getDifference()) < 1) {
+                    font.setColor(achievedValue);
+                }
             } else if (autoPilotMode == AutoPilotMode.VERTICAL_SPEED) {
                 unit = "feet/min";
                 float setClimbRate = autoPilot.getSetClimbRate();
@@ -115,9 +119,9 @@ public class AutoPilotModeDataUI extends FlightDataUI {
                 if (autoPilot.isClimbAndHold()) {
                     mode = "CLH";
                     if (setClimbRate != 0 && (autoPilot.getSetAltitude() < aircraft.getPosition().y == setClimbRate > 0)) {
-                        font.setColor(FlightDataUI.warning);
+                        font.setColor(warning);
                     }
-                    font.draw(batch, Math.round(autoPilot.getSetAltitude() * UnitConversionUtils.getM2Feet()) + " feet", x, y + 160);
+                    font.draw(batch, Math.round(autoPilot.getSetAltitude() * UnitConversionUtils.getM2Feet()) + " feet", x, y + 180);
                 } else {
                     mode = "VS";
                 }
@@ -125,10 +129,13 @@ public class AutoPilotModeDataUI extends FlightDataUI {
                 mode = "ALT";
                 unit = "feet";
                 setValue = autoPilot.getSetAltitude() * UnitConversionUtils.getM2Feet();
+                if (Math.abs(autoPilot.altitudeController.getDifference()) < UnitConversionUtils.getFeet2M(1)) {
+                    font.setColor(achievedValue);
+                }
             }
-            font.draw(batch, Math.round(setValue) + " " + unit, x, y + 180);
+            font.draw(batch, Math.round(setValue) + " " + unit, x, y + 200);
             font.setColor(FlightDataUI.color);
-            font.draw(batch, "AP: " + mode, x, y + 200);
+            font.draw(batch, "AP: " + mode, x, y + 220);
 
             if (autoPilot.getMode() != AutoPilotMode.PITCH_HOLD) {
                 for (int i = 0; i < x_bases.size; i += 2) {

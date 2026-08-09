@@ -10,7 +10,8 @@ import io.github.example.utils.MathUtils;
 public class Wing {
     private final Aircraft aircraft;
     private final float area;
-    private final Vector2 wind, aerodynamicForce;
+    private final Vector2 aerodynamicForce;
+    private final Wind wind;
     private final AerodynamicCoefficient Cl, Cd, Cm;
     private final float chordLength = Config.getFloat("aircraft1.chordLength");
     private float angleOfAttack, airspeed, indicatedAirspeed, drag, flightPathAngle;
@@ -19,7 +20,7 @@ public class Wing {
         this.aircraft = aircraft;
         this.area = Config.getFloat("aircraft1.wingArea"); // wing surface area [m²]
         this.aerodynamicForce = new Vector2(0, 0);
-        this.wind = new Vector2(0, 0); // -20, 0
+        this.wind = new Wind();
 
         // Initialize aerodynamic coefficients
         Cl = new AerodynamicCoefficient(new float[]{-180, -90, -30, -20, -10, 0, 8, 10, 12, 15, 18, 21, 26, 32, 60, 90, 135, 180},
@@ -28,11 +29,10 @@ public class Wing {
             new float[]{0.05f, 1.35f, 0.6f,  0.22f,  0.16f, 0.08f, 0.045f, 0.02f, 0.025f, 0.032f, 0.045f, 0.07f, 0.12f,  0.22f, 0.6f, 1.35f, 0.05f});
         Cm = new AerodynamicCoefficient(new float[]{-180, -135, -90, -60, -30, -20, -10, 0, 10, 20, 30, 60, 90, 135, 180},
             new float[]{0, 0.15f, 0.2f, 0.18f, 0.1f, 0.06f, 0.02f, -0.05f, -0.08f, -0.1f, -0.12f, -0.18f, -0.2f, -0.15f, 0}); // approx neg sin wave
-
     }
 
     public void updateAerodynamics(Air air, float Cm_deltaE) {
-        Vector2 windRelativeToAircraft = aircraft.getVelocity().cpy().sub(wind);
+        Vector2 windRelativeToAircraft = aircraft.getVelocity().cpy().sub(wind.getVelocity());
         airspeed = windRelativeToAircraft.len();
         indicatedAirspeed = (float) (airspeed * Math.sqrt(air.getDensityRatio()));
         flightPathAngle = MathUtils.putInDomain(windRelativeToAircraft.angleDeg()); // angle between aircraft velocity vector and wind velocity vector
@@ -48,11 +48,6 @@ public class Wing {
         aerodynamicForce.x = -drag; // drag
 //        System.out.println("L over D: " + aerodynamicForce.y / -aerodynamicForce.x);
         aerodynamicForce.rotateDeg(flightPathAngle); // put in airspeed frame
-    }
-
-    public void updateWind(float height) {
-        float startHeight = 3;
-        wind.x = height > 100 + startHeight ? -20 : height < startHeight ? 0 : -0.2f * (height - startHeight);
     }
 
     public AerodynamicCoefficient getCl() {
@@ -75,7 +70,7 @@ public class Wing {
         return aerodynamicForce;
     }
 
-    public Vector2 getWind() {
+    public Wind getWind() {
         return wind;
     }
 

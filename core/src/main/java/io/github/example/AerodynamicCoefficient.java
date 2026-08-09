@@ -4,16 +4,16 @@ public class AerodynamicCoefficient {
     float[] alphas;
     float[] coefficients;
 
-    public AerodynamicCoefficient(float[] alphas, float[] coefficients){
+    public AerodynamicCoefficient(float[] alphas, float[] coefficients) {
         this.alphas = alphas;
         this.coefficients = coefficients;
     }
 
-    public float calculateCoefficient(float angleOfAttack){
-        for (int i = 1; i < alphas.length; i++){
+    public float calculateCoefficient(float angleOfAttack) {
+        for (int i = 1; i < alphas.length; i++) {
             float alpha = alphas[i];
             float previousAlpha = alphas[i-1];
-            if (angleOfAttack >= previousAlpha && angleOfAttack <= alpha){
+            if (angleOfAttack >= previousAlpha && angleOfAttack <= alpha) {
                 float dA = alpha - previousAlpha;
                 float dC = coefficients[i] - coefficients[i-1];
                 float slope = dC / dA;

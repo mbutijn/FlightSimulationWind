@@ -30,7 +30,8 @@ public class FlightSimulation extends ApplicationAdapter implements InputProcess
     private BackGround backGround;
     private final Air air;
     private Array<FlightDataUI> uiComponents;
-    private DataTape altitudeTape, velocityTape;
+    private AltitudeDataTape altitudeTape;
+    private SpeedDataTape velocityTape;
     private PitchAngleDataUI pitchAngleDataUI;
     private AngleOfAttackDataUI angleOfAttackDataUI;
     private ThrottleDataUI throttleDataUI;
@@ -59,10 +60,10 @@ public class FlightSimulation extends ApplicationAdapter implements InputProcess
         aircraft = new Aircraft(air);
 
         batch = new SpriteBatch();
-        altitudeTape = new DataTape(aircraft, uiViewport, shape, batch, uiViewport.getWorldWidth() - 110, 0.5f * uiViewport.getWorldHeight() - 150);
+        altitudeTape = new AltitudeDataTape(aircraft, uiViewport, shape, batch, uiViewport.getWorldWidth() - 110, 0.5f * uiViewport.getWorldHeight() - 150);
         altitudeTape.setProperties(60, 2f, 10);
         climbRateDataUI = new ClimbRateDataUI(aircraft, uiViewport, shape, batch, uiViewport.getWorldWidth() - 220, 85);
-        velocityTape = new DataTape(aircraft, uiViewport, shape, batch, 0, 0.5f * uiViewport.getWorldHeight() - 150);
+        velocityTape = new SpeedDataTape(aircraft, uiViewport, shape, batch, 10, 0.5f * uiViewport.getWorldHeight() - 150);
         velocityTape.setProperties(20, 6f, 10);
         pitchAngleDataUI = new PitchAngleDataUI(aircraft,  uiViewport, shape, batch, 0.5f * uiViewport.getWorldWidth() - 37.5f, 0);
         throttleDataUI = new ThrottleDataUI(aircraft, uiViewport, shape, batch, uiViewport.getWorldWidth() - 380, 85);

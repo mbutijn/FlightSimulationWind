@@ -27,11 +27,11 @@ public class PIDController {
         this.errorIntegral += error;
     }
 
-    public float calculateOutput(){
+    public float calculateOutput() {
         float output = P * error + I * errorIntegral + D * errorDot;
 
         // limit values
-        if (output < minValue){
+        if (output < minValue) {
             return minValue;
         }
         return Math.min(output, maxValue);
@@ -45,5 +45,9 @@ public class PIDController {
 
     public void resetErrorIntegral() {
         this.errorIntegral = 0;
+    }
+
+    public float getDifference() {
+        return error;
     }
 }
