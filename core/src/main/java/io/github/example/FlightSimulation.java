@@ -141,8 +141,13 @@ public class FlightSimulation extends ApplicationAdapter implements InputProcess
 
             shape.begin(ShapeRenderer.ShapeType.Line);
             shape.setProjectionMatrix(worldCamera.combined);
-//            aircraft.renderHitBox(shape);
-//            aircraft.renderCenterOfGravity(shape);
+            aircraft.renderHitBox(shape);
+            aircraft.renderCenterOfGravity(shape);
+            aircraft.renderWheelSuspensionPoints(shape);
+            batch.begin();
+            aircraft.getGear().getFrontWheel().render(batch);
+            aircraft.getGear().getRearWheel().render(batch);
+            batch.end();
             uiViewport.apply();
             shape.setProjectionMatrix(uiCamera.combined);
 
@@ -194,17 +199,23 @@ public class FlightSimulation extends ApplicationAdapter implements InputProcess
             paused = !paused;
             System.out.println("paused: " + paused);
         }
-        if (keycode == Input.Keys.PAGE_DOWN){
+        if (keycode == Input.Keys.PAGE_DOWN) {
             aircraft.getEngine().setChangeThrottle(ChangeThrottle.DOWN);
         }
-        if (keycode == Input.Keys.PAGE_UP){
+        if (keycode == Input.Keys.PAGE_UP) {
             aircraft.getEngine().setChangeThrottle(ChangeThrottle.UP);
         }
-        if (keycode == Input.Keys.HOME){
+        if (keycode == Input.Keys.HOME) {
             worldCamera.zoom = 0.1f;
         }
-        if (keycode == Input.Keys.B){
+        if (keycode == Input.Keys.B) {
             aircraft.getGear().setBrakeCommand(BrakeCommand.BRAKE);
+        }
+        if (keycode == Input.Keys.F2) {
+            aircraft.toggleRenderHitBox();
+        }
+        if (keycode == Input.Keys.F3) {
+            aircraft.toggleRenderCenterOfGravity();
         }
         return true;
     }

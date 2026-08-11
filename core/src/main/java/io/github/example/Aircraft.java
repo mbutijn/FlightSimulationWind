@@ -1,5 +1,6 @@
 package io.github.example;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Polygon;
 import io.github.example.AircraftComponents.AutoPilot;
@@ -29,6 +30,8 @@ public class Aircraft {
     private final Gear gear;
     private final Wing wing;
     private final Vector2 cgPosition;
+    private boolean renderHitBox = false;
+    private boolean renderPointsInAircraft = false;
 //    private boolean noseUp;
 //    private long time;
 
@@ -39,7 +42,7 @@ public class Aircraft {
         this.wing = new Wing(this);
         this.air = air;
         this.engine = new Engine(this);
-        this.sprite = new Sprite(new Texture("aircraft.png"));
+        this.sprite = new Sprite(new Texture("aircraftNoGear.png"));
         this.cgPosition = new Vector2(0.65f, 0.5f);
         sprite.setSize(10, 10);
         sprite.setOrigin(cgPosition.x * sprite.getWidth(), cgPosition.y * sprite.getHeight());
@@ -80,6 +83,8 @@ public class Aircraft {
         pitchAcceleration = (pitchMoment + gear.getMoment()) / momentOfInertia;
         pitchRate = integrate(pitchRate, pitchAcceleration, timeStep);
         pitchAngle = MathUtils.putInDomain(integrate(pitchAngle, pitchRate, timeStep));
+
+//        gear.updateNormalForcesAndMoment(timeStep);
 //        if (noseUp != pitchAngle > 0){
 //            long now = System.currentTimeMillis();
 //            System.out.println(now - time);
@@ -140,8 +145,8 @@ public class Aircraft {
     public void reset() {
         System.out.println("reset");
 
-        this.position = new Vector2(0, UnitConversionUtils.convertFeet2M(250)); // 0, 2500 (service ceiling = 4267.2f)
-        this.velocity = new Vector2(35, 0); // 55, 0
+        this.position = new Vector2(0, UnitConversionUtils.convertFeet2M(6)); // 0, 2500 (service ceiling = 4267.2f)
+        this.velocity = new Vector2(0, 0); // 55, 0
         this.acceleration = new Vector2(0, 0);
         this.engine.reset();
         this.wing.reset();
@@ -205,6 +210,10 @@ public class Aircraft {
         return pitchAngle;
     }
 
+    public float getPitchAngleInRadians() {
+        return (float) Math.toRadians(pitchAngle);
+    }
+
     public float getWeight() {
         return weight.len();
     }
@@ -249,7 +258,10 @@ public class Aircraft {
     }
 
     public void renderHitBox(ShapeRenderer shape) {
-        shape.polygon(hitBox.getTransformedVertices());
+        if (renderHitBox) {
+            shape.setColor(Color.BLACK);
+            shape.polygon(hitBox.getTransformedVertices());
+        }
     }
 
     public Polygon getHitBox() {
@@ -261,9 +273,10 @@ public class Aircraft {
     }
 
     public void renderCenterOfGravity(ShapeRenderer shape) {
-//        shape.circle(position.x, position.y, 0.1f, 20);
-//        shape.circle(sprite.getOriginX(), sprite.getOriginY(), 0.1f, 20);
-        shape.circle(sprite.getX() + cgPosition.x * sprite.getWidth(), sprite.getY() + cgPosition.y * sprite.getHeight(), 0.1f, 20);
+        if (renderPointsInAircraft) {
+            shape.setColor(Color.BLACK);
+            shape.circle(sprite.getX() + cgPosition.x * sprite.getWidth(), sprite.getY() + cgPosition.y * sprite.getHeight(), 0.1f, 20);
+        }
     }
 
     public Sprite getSprite() {
@@ -288,5 +301,24 @@ public class Aircraft {
 
     public boolean isMovingForward() {
         return velocity.x > 0;
+    }
+
+    public void renderWheelSuspensionPoints(ShapeRenderer shape) {
+//        gear.getFrontWheel().renderStructure(shape);
+//        gear.getRearWheel().renderStructure(shape);
+
+        if (renderPointsInAircraft) {
+            shape.setColor(Color.BLACK);
+            gear.getFrontWheel().renderSuspensionPoint(shape);
+            gear.getRearWheel().renderSuspensionPoint(shape);
+        }
+    }
+
+    public void toggleRenderHitBox() {
+        renderHitBox = !renderHitBox;
+    }
+
+    public void toggleRenderCenterOfGravity() {
+        renderPointsInAircraft = !renderPointsInAircraft;
     }
 }

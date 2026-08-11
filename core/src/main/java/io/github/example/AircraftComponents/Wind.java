@@ -19,11 +19,11 @@ public class Wind {
         for (int i = 1; i < heights.length; i++) {
             float currentHeight = heights[i];
             float previousHeight = heights[i-1];
-            if (inputHeight >= previousHeight && inputHeight <= currentHeight){
+            if (inputHeight >= previousHeight && inputHeight <= currentHeight) {
                 float dH = currentHeight - previousHeight;
-                float dW = alpha[i] * (windSpeeds[i] - windSpeeds[i-1]);
+                float dW = alpha[i] * windSpeeds[i] - alpha[i-1] * windSpeeds[i-1];
                 float slope = dW / dH;
-                velocity.x =  (alpha[i] * windSpeeds[i-1] + (inputHeight - previousHeight) * slope);
+                velocity.x = alpha[i-1] * windSpeeds[i-1] + (inputHeight - previousHeight) * slope;
             }
         }
     }

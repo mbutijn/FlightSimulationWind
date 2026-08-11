@@ -13,14 +13,14 @@ public class Gear {
         this.aircraft = aircraft;
 
         float [] vertices = aircraft.getHitBox().getVertices();
-        float xFront = vertices[10];
-        float yFront = vertices[11];
+        float xFront = vertices[10]; // = 8.0 front gear (right)
+        float yFront = vertices[11]; // = 3.3
 
-        float xRear = vertices[12];
-        float yRear = vertices[13];
+        float xRear = vertices[12]; // = 5.6 rear gear (left)
+        float yRear = vertices[13]; // = 3.3
 
-        float x_cg = aircraft.getSprite().getX() + aircraft.getCgPosition().x * aircraft.getSprite().getWidth();
-        float y_cg = aircraft.getSprite().getY() + aircraft.getCgPosition().y * aircraft.getSprite().getHeight();
+        float x_cg = aircraft.getSprite().getX() + aircraft.getCgPosition().x * aircraft.getSprite().getWidth(); // = 6.5
+        float y_cg = aircraft.getSprite().getY() + aircraft.getCgPosition().y * aircraft.getSprite().getHeight(); // = 5.0
 
         this.frontWheel = new Wheel(aircraft, xFront - x_cg, yFront - y_cg, 0.7f * 37634.7f, 5000);
         this.rearWheel = new Wheel(aircraft, xRear - x_cg, yRear - y_cg, 1.3f * 37634.7f, 5000);
