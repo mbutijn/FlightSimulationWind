@@ -40,7 +40,6 @@ public class ClimbRateDataUI extends FlightDataUI {
     }
 
     public void drawSetValue() {
-        //shape.setColor(Color.MAGENTA);
         shape.setColor(aircraft.getAutoPilot().climbRateIsCloseToSetValue() ? FlightDataUI.achievedValueColor : Color.MAGENTA);
         float angleSet = mps2Degree * aircraft.getAutoPilot().getSetClimbRate();
         float cos = (float) Math.cos(Math.toRadians(180 - angleSet));

@@ -46,15 +46,19 @@ public class Aircraft {
         this.cgPosition = new Vector2(0.65f, 0.5f);
         sprite.setSize(10, 10);
         sprite.setOrigin(cgPosition.x * sprite.getWidth(), cgPosition.y * sprite.getHeight());
-        hitBox = new Polygon(new float[]{
+        hitBox = new Polygon(new float[] {
             1.1f, 4.8f, // bottom tail (left)
             0.9f, 6.8f, // tail top (left)
-            4.3f, 6.8f, // top
+            1.7f, 6.8f, // tail top (right)
+            3.0f, 5.6f, // bottom tail (right)
+            6.3f, 6.1f, // roof
             9.5f, 5.0f, // front (right)
-            8.2f, 4.1f, // bottom front fuselage (right)
+            8.3f, 3.9f, // bottom front fuselage (right)
+
             8.0f, 3.3f, // front gear (right)
             5.6f, 3.3f, // rear gear (left)
-            4.9f, 4.1f // bottom rear fuselage (left)
+
+            4.9f, 3.9f  // bottom rear fuselage (left)
         });
 
         this.reset();
@@ -124,8 +128,8 @@ public class Aircraft {
         hitBox.setOrigin(sprite.getOriginX(), sprite.getOriginY());
         hitBox.setRotation(sprite.getRotation());
         float [] vertices = hitBox.getTransformedVertices();
-        for (int i = 1; i < vertices.length; i += 2){
-            if (i != 11 && i != 13) { // skip the landing gear y positions
+        for (int i = 1; i < vertices.length; i += 2) {
+            if (i != 15 && i != 17) { // skip the landing gear y positions
                 if (vertices[i] < 0) {
                     return true;
                 }
@@ -304,9 +308,6 @@ public class Aircraft {
     }
 
     public void renderWheelSuspensionPoints(ShapeRenderer shape) {
-//        gear.getFrontWheel().renderStructure(shape);
-//        gear.getRearWheel().renderStructure(shape);
-
         if (renderPointsInAircraft) {
             shape.setColor(Color.BLACK);
             gear.getFrontWheel().renderSuspensionPoint(shape);

@@ -13,6 +13,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import io.github.example.AircraftComponents.AutoPilot;
+import io.github.example.AircraftComponents.Gear;
 import io.github.example.AircraftComponents.Wing;
 import io.github.example.UIComponents.*;
 import io.github.example.utils.UnitConversionUtils;
@@ -108,7 +109,7 @@ public class FlightSimulation extends ApplicationAdapter implements InputProcess
     public void render() {
         if (!paused) {
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-            
+
             // PHASE 1: World rendering (background & aircraft)
             worldViewport.apply();
             batch.setProjectionMatrix(worldCamera.combined);
@@ -116,16 +117,8 @@ public class FlightSimulation extends ApplicationAdapter implements InputProcess
             backGround.render(batch, worldCamera, worldViewport.getScreenWidth(), worldViewport.getScreenHeight());
             aircraft.render(batch);
             batch.end();
-            
-            // PHASE 2: Physics debug rendering (hitbox, center of gravity, suspension points)
-            shape.begin(ShapeRenderer.ShapeType.Line);
-            shape.setProjectionMatrix(worldCamera.combined);
-            aircraft.renderHitBox(shape);
-            aircraft.renderCenterOfGravity(shape);
-            aircraft.renderWheelSuspensionPoints(shape);
-            shape.end();
-            
-            // PHASE 3: Game state updates
+
+            // PHASE 2: Game state updates
             float deltaTime = Gdx.graphics.getDeltaTime();
             worldCamera.update();
             uiCamera.update();
@@ -133,42 +126,57 @@ public class FlightSimulation extends ApplicationAdapter implements InputProcess
                 aircraft.updateAutoPilot();
             }
             aircraft.update(deltaTime);
-            
-            // PHASE 4: Wheel rendering (after physics update)
+
+            // PHASE 3: Physics debug rendering (hitbox, center of gravity, suspension points)
+            shape.begin(ShapeRenderer.ShapeType.Line);
+            shape.setProjectionMatrix(worldCamera.combined);
+            aircraft.renderHitBox(shape);
+            aircraft.renderCenterOfGravity(shape);
+            aircraft.renderWheelSuspensionPoints(shape);
+            shape.end();
+
+            // PHASE 4: Render the gear frame
+            Gear gear = aircraft.getGear();
+            shape.begin(ShapeRenderer.ShapeType.Filled);
+            gear.renderFrame(shape);
+            shape.end();
+
+            // PHASE 5: Wheel rendering (after physics update)
             batch.begin();
-            aircraft.getGear().getFrontWheel().render(batch);
-            aircraft.getGear().getRearWheel().render(batch);
+
+            gear.getFrontWheel().render(batch);
+            gear.getRearWheel().render(batch);
             batch.end();
-            
-            // PHASE 5: UI rendering - switch to UI viewport and camera
+
+            // PHASE 6: UI rendering - switch to UI viewport and camera
             uiViewport.apply();
             shape.setProjectionMatrix(uiCamera.combined);
-            
+
             // Draw static UI components (tapes, indicators)
             AutoPilot autoPilot = aircraft.getAutoPilot();
             shape.begin(ShapeRenderer.ShapeType.Filled);
             shape.setColor(FlightDataUI.standardColor);
-            
-            altitudeTape.drawTape(UnitConversionUtils.convertM2Feet(aircraft.getPosition().y), 
-                steeringMode == SteeringMode.AUTO_PILOT && autoPilot.drawSetAltitude(), 
+
+            altitudeTape.drawTape(UnitConversionUtils.convertM2Feet(aircraft.getPosition().y),
+                steeringMode == SteeringMode.AUTO_PILOT && autoPilot.drawSetAltitude(),
                 UnitConversionUtils.convertM2Feet(autoPilot.getSetAltitude()));
             altitudeTape.drawStaticPart();
-            
+
             Wing wing = aircraft.getWing();
-            velocityTape.drawTape(UnitConversionUtils.convertMps2Knts(wing.getTrueAirspeed()), 
-                steeringMode == SteeringMode.AUTO_PILOT && autoPilot.drawSetAirspeed(), 
+            velocityTape.drawTape(UnitConversionUtils.convertMps2Knts(wing.getTrueAirspeed()),
+                steeringMode == SteeringMode.AUTO_PILOT && autoPilot.drawSetAirspeed(),
                 UnitConversionUtils.convertMps2Knts(autoPilot.getSetAirspeed()));
             velocityTape.drawStallRegionsWarning(UnitConversionUtils.convertMps2Knts(aircraft.getStallSpeed()));
             shape.setColor(FlightDataUI.standardColor);
             velocityTape.drawStaticPart();
             angleOfAttackDataUI.drawStaticPart();
             pitchAngleDataUI.draw(steeringMode == SteeringMode.AUTO_PILOT && autoPilot.getMode() == AutoPilotMode.PITCH_HOLD);
-            
+
             shape.end();
-            
-            // PHASE 6: Dynamic UI components
+
+            // PHASE 7: Dynamic UI components
             shape.begin(ShapeRenderer.ShapeType.Line);
-            
+
             for (FlightDataUI flightDataUI : uiComponents) {
                 flightDataUI.draw();
             }
@@ -176,7 +184,7 @@ public class FlightSimulation extends ApplicationAdapter implements InputProcess
                 climbRateDataUI.drawSetValue();
             }
             shape.end();
-            
+
             // PHASE 7: UI text rendering
             batch.setProjectionMatrix(uiCamera.combined);
             batch.begin();
@@ -187,16 +195,16 @@ public class FlightSimulation extends ApplicationAdapter implements InputProcess
             velocityTape.writeValues(UnitConversionUtils.convertMps2Knts(wing.getTrueAirspeed()));
             steeringModeDataUI.writeSteeringMode(steeringMode);
             batch.end();
-            
+
             // Update UI color for altitude-based readability
             FlightDataUI.updateUIColor(aircraft.getPosition().y);
-            
-            // Update camera position if following aircraft
-            if (camFocusAircraft) {
-                Vector2 pos = aircraft.getPosition();
-                worldCamera.position.x = pos.x;
-                worldCamera.position.y = pos.y;
-            }
+        }
+
+        // Update camera position if following aircraft
+        if (camFocusAircraft) {
+            Vector2 pos = aircraft.getPosition();
+            worldCamera.position.x = pos.x;
+            worldCamera.position.y = pos.y;
         }
     }
 
