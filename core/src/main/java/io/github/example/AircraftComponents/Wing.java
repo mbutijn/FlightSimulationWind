@@ -36,7 +36,7 @@ public class Wing {
         airspeed = windRelativeToAircraft.len();
         indicatedAirspeed = (float) (airspeed * Math.sqrt(air.getDensityRatio()));
         flightPathAngle = MathUtils.putInDomain(windRelativeToAircraft.angleDeg()); // angle between aircraft velocity vector and wind velocity vector
-        angleOfAttack = MathUtils.putInDomain(aircraft.getPitchAngle() - flightPathAngle);
+        angleOfAttack = MathUtils.putInDomain(aircraft.getPitchAngleInDegrees() - flightPathAngle);
 
         float dynamicPressure = 0.5f * air.getDensity() * windRelativeToAircraft.len2();
         float totalCm = Cm.calculateCoefficient(angleOfAttack) - 0.07f * aircraft.getPitchRate() + Cm_deltaE; // pitch moment coefficient

@@ -61,21 +61,21 @@ public class FlightSimulation extends ApplicationAdapter implements InputProcess
         aircraft = new Aircraft(air);
 
         batch = new SpriteBatch();
-        altitudeTape = new AltitudeDataTape(aircraft, uiViewport, shape, batch, uiViewport.getWorldWidth() - 110, 0.5f * uiViewport.getWorldHeight() - 150);
+        altitudeTape = new AltitudeDataTape(aircraft, uiViewport, shape, batch, uiViewport.getWorldWidth() - 110, 0.5f * uiViewport.getWorldHeight() - 130);
         altitudeTape.setProperties(60, 2f, 10);
         climbRateDataUI = new ClimbRateDataUI(aircraft, uiViewport, shape, batch, uiViewport.getWorldWidth() - 220, 85);
-        velocityTape = new SpeedDataTape(aircraft, uiViewport, shape, batch, 10, 0.5f * uiViewport.getWorldHeight() - 150);
+        velocityTape = new SpeedDataTape(aircraft, uiViewport, shape, batch, 10, 0.5f * uiViewport.getWorldHeight() - 130);
         velocityTape.setProperties(20, 6f, 10);
         pitchAngleDataUI = new PitchAngleDataUI(aircraft,  uiViewport, shape, batch, 0.5f * uiViewport.getWorldWidth() - 37.5f, 0);
         throttleDataUI = new ThrottleDataUI(aircraft, uiViewport, shape, batch, uiViewport.getWorldWidth() - 380, 85);
         angleOfAttackDataUI = new AngleOfAttackDataUI(aircraft, uiViewport, shape, batch, 100, 75);
         ElevatorDataUI elevatorDataUI = new ElevatorDataUI(aircraft, uiViewport, shape, batch, 300, 75);
         SpeedDataUI speedDataUI = new SpeedDataUI(aircraft, uiViewport, shape, batch, 20, 0.5f * uiViewport.getWorldHeight() - 160);
-        BrakeDataUI brakeDataUI = new BrakeDataUI(aircraft, uiViewport, shape, batch, uiViewport.getWorldWidth() - 70, 35);
+        GearDataUI brakeDataUI = new GearDataUI(aircraft, uiViewport, shape, batch, uiViewport.getWorldWidth() - 120, 35);
         steeringModeDataUI = new SteeringModeDataUI(aircraft, uiViewport, shape, batch, 0.5f * uiViewport.getWorldWidth() - 100f, 0.75f * uiViewport.getWorldHeight());
         AirPropertiesDataUI airPropertiesDataUI = new AirPropertiesDataUI(aircraft, uiViewport, shape, batch, uiViewport.getWorldWidth() - 120, uiViewport.getWorldHeight() - 50);
         airPropertiesDataUI.setAir(air);
-        autoPilotModeDataUI = new AutoPilotModeDataUI(aircraft, uiViewport, shape, batch, uiViewport.getWorldWidth() - 100, 10);
+        autoPilotModeDataUI = new AutoPilotModeDataUI(aircraft, uiViewport, shape, batch, uiViewport.getWorldWidth() - 100, 30);
 
         worldCamera.setToOrtho(false);
         worldCamera.position.set(worldCamera.viewportWidth / 2, worldCamera.viewportHeight / 2, 0);
@@ -143,9 +143,7 @@ public class FlightSimulation extends ApplicationAdapter implements InputProcess
 
             // PHASE 5: Wheel rendering (after physics update)
             batch.begin();
-
-            gear.getFrontWheel().render(batch);
-            gear.getRearWheel().render(batch);
+            gear.renderWheels(batch);
             batch.end();
 
             // PHASE 6: UI rendering - switch to UI viewport and camera
@@ -231,6 +229,9 @@ public class FlightSimulation extends ApplicationAdapter implements InputProcess
         }
         if (keycode == Input.Keys.HOME) {
             worldCamera.zoom = 0.1f;
+        }
+        if (keycode == Input.Keys.G && !paused) {
+            aircraft.getGear().toggleGearPosition();
         }
         if (keycode == Input.Keys.B) {
             aircraft.getGear().setBrakeCommand(BrakeCommand.BRAKE);

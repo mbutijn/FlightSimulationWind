@@ -1,6 +1,5 @@
 package io.github.example.AircraftComponents;
 
-import com.badlogic.gdx.graphics.Color;
 import io.github.example.Aircraft;
 import io.github.example.AutoPilotMode;
 import io.github.example.PIDController;
@@ -40,7 +39,7 @@ public class AutoPilot {
         float threshold = 5 + Math.abs(setClimbRate * 1.96850393701f);
 
         if (this.mode == AutoPilotMode.PITCH_HOLD) {
-            pitchController.updateValues(setPitchAngle, aircraft.getPitchAngle(), aircraft.getPitchRate());
+            pitchController.updateValues(setPitchAngle, aircraft.getPitchAngleInDegrees(), aircraft.getPitchRate());
             Cm_deltaE = pitchController.calculateOutput();
         } else if (mode == AutoPilotMode.VERTICAL_SPEED) {
             verticalSpeedController.updateValues(setClimbRate, aircraft.getClimbRate(), aircraft.getAcceleration().y);

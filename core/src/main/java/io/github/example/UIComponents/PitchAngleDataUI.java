@@ -28,7 +28,7 @@ public class PitchAngleDataUI extends FlightDataUI {
     public void draw(boolean autoPilot) {
         int limit = 30;
         float heightPerDegree = height / (2 * limit); // = 2
-        float pitchAngle = aircraft.getPitchAngle();
+        float pitchAngle = aircraft.getPitchAngleInDegrees();
         float skyHeight, groundHeight;
 
         if (pitchAngle > -90 && pitchAngle < 90) {
@@ -104,7 +104,7 @@ public class PitchAngleDataUI extends FlightDataUI {
     }
 
     public void writeValues() {
-        int pitchAngleInt = Math.round(aircraft.getPitchAngle());
+        int pitchAngleInt = Math.round(aircraft.getPitchAngleInDegrees());
         int limit = 30;
         float heightPerDegree = height / (2 * limit); // = 2
 

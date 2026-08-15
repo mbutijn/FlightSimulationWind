@@ -81,7 +81,7 @@ public class Aircraft {
         air.updateProperties(position.y);
 
         wing.updateAerodynamics(air, Cm_deltaE); // update Aerodynamic forces and moment
-        gear.updateNormalForcesAndMoment(timeStep);
+        gear.update(timeStep);
 
         // rotation
         pitchAcceleration = (pitchMoment + gear.getMoment()) / momentOfInertia;
@@ -117,19 +117,26 @@ public class Aircraft {
         position.x = integrate(position.x, velocity.x, timeStep);
         position.y = integrate(position.y, velocity.y, timeStep);
 
+        updateHitbox();
+
         if (checkCrashed()){
             System.out.println("aircraft crashed");
             reset();
         }
     }
 
-    public boolean checkCrashed() {
+    private void updateHitbox() {
         hitBox.setPosition(sprite.getX(), sprite.getY());
+        hitBox.getVertices()[15] = 3.9f - 0.6f * gear.getExtensionFactor(); // front gear (right)
+        hitBox.getVertices()[17] = 3.9f - 0.6f * gear.getExtensionFactor(); // rear gear (left)
         hitBox.setOrigin(sprite.getOriginX(), sprite.getOriginY());
         hitBox.setRotation(sprite.getRotation());
+    }
+
+    public boolean checkCrashed() {
         float [] vertices = hitBox.getTransformedVertices();
         for (int i = 1; i < vertices.length; i += 2) {
-            if (i != 15 && i != 17) { // skip the landing gear y positions
+            if (i != 15 && i != 17 || gear.getGearPosition() == GearPosition.UP) { // skip the landing gear y positions if not retracted
                 if (vertices[i] < 0) {
                     return true;
                 }
@@ -149,8 +156,8 @@ public class Aircraft {
     public void reset() {
         System.out.println("reset");
 
-        this.position = new Vector2(0, UnitConversionUtils.convertFeet2M(6)); // 0, 2500 (service ceiling = 4267.2f)
-        this.velocity = new Vector2(0, 0); // 55, 0
+        this.position = new Vector2(0, UnitConversionUtils.convertFeet2M(50)); // 0, 2500 (service ceiling = 4267.2f)
+        this.velocity = new Vector2(55, 0); // 55, 0
         this.acceleration = new Vector2(0, 0);
         this.engine.reset();
         this.wing.reset();
@@ -210,7 +217,7 @@ public class Aircraft {
         return velocity;
     }
 
-    public float getPitchAngle() {
+    public float getPitchAngleInDegrees() {
         return pitchAngle;
     }
 

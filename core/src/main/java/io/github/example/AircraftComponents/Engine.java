@@ -33,7 +33,7 @@ public class Engine {
     public void updateThrust() {
         thrust.x = throttle * powerPerThrottle * aircraft.getAir().getDensityRatio() / aircraft.getWing().getTrueAirspeed();
         thrust.y = 0;
-        thrust.rotateDeg(aircraft.getPitchAngle()); // engine is attached to the vehicle
+        thrust.rotateDeg(aircraft.getPitchAngleInDegrees()); // engine is attached to the vehicle
     }
 
     public Vector2 getThrust() {
