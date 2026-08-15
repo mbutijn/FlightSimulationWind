@@ -104,8 +104,10 @@ public class Aircraft {
         resultantForce.add(wing.getAerodynamicForce());
         resultantForce.add(weight);
         resultantForce.add(engine.getThrust());
-        resultantForce.add(gear.getFrontWheel().getReactionForce());
-        resultantForce.add(gear.getRearWheel().getReactionForce());
+        resultantForce.add(gear.getFrontWheel().getNormalForce());
+        resultantForce.add(gear.getRearWheel().getNormalForce());
+        resultantForce.add(gear.getFrontWheel().getDragForce());
+        resultantForce.add(gear.getRearWheel().getDragForce());
 
         acceleration.y = resultantForce.y / mass;
         acceleration.x = resultantForce.x / mass;
@@ -247,6 +249,10 @@ public class Aircraft {
 
     public Air getAir() {
         return air;
+    }
+
+    public float getDynamicPressure() {
+        return 0.5f * air.getDensity() * wing.getTrueAirspeed() * wing.getTrueAirspeed();
     }
 
     public void render(SpriteBatch batch) {

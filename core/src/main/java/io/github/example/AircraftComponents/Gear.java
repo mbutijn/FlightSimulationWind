@@ -8,7 +8,6 @@ import io.github.example.BrakeCommand;
 import io.github.example.GearPosition;
 
 public class Gear {
-    private final Aircraft aircraft;
     private final Wheel frontWheel, rearWheel;
     private float moment;
     private BrakeCommand brakeCommand;
@@ -18,7 +17,6 @@ public class Gear {
     private float extensionFactor = 1.0f; // 1.0 means fully extended, 0.0 means fully retracted
 
     public Gear(Aircraft aircraft) {
-        this.aircraft = aircraft;
 
         float [] vertices = aircraft.getHitBox().getVertices();
         float xFront = vertices[14]; // = 8.0 front gear (right)
@@ -37,22 +35,15 @@ public class Gear {
 
     public void update(float dt) {
         // step 1 Update gear position
-        //Polygon hitBox = aircraft.getHitBox();
         if (gearPosition == GearPosition.RETRACTING) {
             float time = System.currentTimeMillis() - beginTimeRetracting;
             float RETRACTING_TIME = 3000; // milliseconds
             extensionFactor = 1 - (time / RETRACTING_TIME);
             processGearWheels();
-            //float [] vertices = hitBox.getVertices();
-
-//            aircraft.updateHitBox(1 - (time / RETRACTING_TIME));
-
             if (time >= RETRACTING_TIME) {
                 gearPosition = GearPosition.UP;
             }
-        }
-
-        if (gearPosition == GearPosition.EXTENDING) {
+        } else if (gearPosition == GearPosition.EXTENDING) {
             float time = System.currentTimeMillis() - beginTimeExtending;
             float EXTENDING_TIME = 3000; // milliseconds
             extensionFactor = time / EXTENDING_TIME;
@@ -63,18 +54,18 @@ public class Gear {
         }
 
         // step 2 Update normal forces and moment
-        frontWheel.updateReactionForceAndMoment(dt, frontWheel.isOnGround() && brakeCommand == BrakeCommand.BRAKE);
-        rearWheel.updateReactionForceAndMoment(dt, rearWheel.isOnGround() && brakeCommand == BrakeCommand.BRAKE);
+        frontWheel.updateAllForcesAndMoment(dt, frontWheel.isOnGround() && brakeCommand == BrakeCommand.BRAKE);
+        rearWheel.updateAllForcesAndMoment(dt, rearWheel.isOnGround() && brakeCommand == BrakeCommand.BRAKE);
 
-        moment = frontWheel.getMoment();
-        moment += rearWheel.getMoment();
+        moment = frontWheel.getMomentNormalForce();
+        moment += rearWheel.getMomentNormalForce();
+
+        moment += frontWheel.getMomentDragContribution();
+        moment += rearWheel.getMomentDragContribution();
     }
 
     private void processGearWheels() {
-        //float position = 1.07f + 0.68f * extensionFactor;
-//        frontWheel.updateShape(extensionFactor);
         frontWheel.updateFrameDistanceAndPosition(extensionFactor);
-//        rearWheel.updateShape(extensionFactor);
         rearWheel.updateFrameDistanceAndPosition(extensionFactor);
     }
 
@@ -94,6 +85,8 @@ public class Gear {
         frontWheel.reset();
         rearWheel.reset();
         moment = 0;
+        extensionFactor = 1.0f;
+        gearPosition = GearPosition.DOWN;
     }
 
     public void renderFrame(ShapeRenderer shape) {

@@ -10,9 +10,9 @@ import io.github.example.GearPosition;
 
 public class Wheel {
     private final Aircraft aircraft;
-    private final Vector2 position, reactionForce, suspensionPoint, suspensionMoving, startFrame;
+    private final Vector2 normalForce, drag, position, suspensionPoint, suspensionMoving, startFrame;
     private final float stiffness, damping, angle, fuselageSectionDistance;
-    private float moment, previousDisplacement, frameDistance;
+    private float momentNormalForce, momentDrag, previousDisplacement, frameDistance;
     private boolean onGround;
     private final Sprite sprite;
     private final float radius = 0.325f;
@@ -24,8 +24,9 @@ public class Wheel {
         this.suspensionPoint = new Vector2(x, 0); // front: 1.5, 0; rear: -0.9, 0
         this.suspensionMoving = new Vector2(0,0);
         this.startFrame = new Vector2(0, 0);
-        this.reactionForce = new Vector2(0, 0);
-        this.moment = 0;
+        this.normalForce = new Vector2(0, 0);
+        this.drag = new Vector2(0, 0);
+        this.momentNormalForce = 0;
         this.stiffness = stiffness;
         this.damping = damping;
         this.onGround = false;
@@ -35,34 +36,40 @@ public class Wheel {
         this.frameDistance = 1.75f;
     }
 
-    public void updateReactionForceAndMoment(float dt, boolean isBraking) {
-        float pitchAngle = aircraft.getPitchAngleInRadians();
-        suspensionMoving.x = aircraft.getPosition().x + suspensionPoint.x * (float) Math.cos(pitchAngle) - suspensionPoint.y * (float) Math.sin(pitchAngle);
-        suspensionMoving.y = aircraft.getPosition().y + suspensionPoint.x * (float) Math.sin(pitchAngle) + suspensionPoint.y * (float) Math.cos(pitchAngle);
+    public void updateAllForcesAndMoment(float dt, boolean isBraking) {
+        float pitchAngleRad = aircraft.getPitchAngleInRadians();
+        suspensionMoving.x = aircraft.getPosition().x + suspensionPoint.x * (float) Math.cos(pitchAngleRad) - suspensionPoint.y * (float) Math.sin(pitchAngleRad);
+        suspensionMoving.y = aircraft.getPosition().y + suspensionPoint.x * (float) Math.sin(pitchAngleRad) + suspensionPoint.y * (float) Math.cos(pitchAngleRad);
 
-        position.setAngleRad(pitchAngle + angle);
+        position.setAngleRad(pitchAngleRad + angle);
         float displacement = position.y + aircraft.getPosition().y;
 
         if (displacement < 0 && aircraft.getGear().getGearPosition() == GearPosition.DOWN) {
-            reactionForce.y = -stiffness * displacement - damping * (displacement - previousDisplacement) / dt; // normal force
+            normalForce.y = -stiffness * displacement - damping * (displacement - previousDisplacement) / dt; // normal force
             float frictionCoefficient = aircraft.isMovingForward() ? 0.05f : 0.1f;
 
             if (aircraft.isMovingForward()) {
-                reactionForce.x = -frictionCoefficient * reactionForce.y + (isBraking ? -1000 : 0);
+                normalForce.x = -frictionCoefficient * normalForce.y + (isBraking ? -1000 : 0);
             } else {
-                reactionForce.x = frictionCoefficient * reactionForce.y + (isBraking ? 1000 : 0);
+                normalForce.x = frictionCoefficient * normalForce.y + (isBraking ? 1000 : 0);
             }
 
-            moment = (position.x * reactionForce.y) - (position.y * reactionForce.x); // cross product
+            momentNormalForce = (position.x * normalForce.y) - (position.y * normalForce.x); // cross product
             onGround = true;
             previousDisplacement = displacement;
         } else {
-            reactionForce.y = 0;
+            normalForce.y = 0;
             onGround = false;
         }
 
+        if (aircraft.getGear().getGearPosition() == GearPosition.UP) {
+            drag.setZero();
+        } else {
+            updateDragAndMomentContribution(pitchAngleRad);
+        }
+
         float suspensionLength = Math.min(displacement, 0) + frameDistance - radius;
-        float suspensionAngle = aircraft.getPitchAngleInRadians() - 0.5f * (float) (Math.PI);
+        float suspensionAngle = pitchAngleRad - 0.5f * (float) (Math.PI);
         float cosSuspension = (float) Math.cos(suspensionAngle);
         float sinSuspension = (float) Math.sin(suspensionAngle);
 
@@ -72,20 +79,36 @@ public class Wheel {
 
         startFrame.x = suspensionMoving.x + fuselageSectionDistance * cosSuspension;
         startFrame.y = suspensionMoving.y + fuselageSectionDistance * sinSuspension;
-
     }
 
-    public Vector2 getReactionForce() {
-        return reactionForce;
+    public void updateDragAndMomentContribution(float pitchAngleRad) {
+        float dragCoefficient = aircraft.getGear().getExtensionFactor() * 0.05f;
+        float dynamicPressure = aircraft.getDynamicPressure();
+        drag.x = -dragCoefficient * dynamicPressure * (float) Math.cos(pitchAngleRad);
+        drag.y = -dragCoefficient * dynamicPressure * (float) Math.sin(pitchAngleRad);
+        momentDrag = (position.x * drag.y) - (position.y * drag.x); // cross product
     }
 
-    public float getMoment() {
-        return moment;
+    public Vector2 getNormalForce() {
+        return normalForce;
+    }
+
+    public Vector2 getDragForce() {
+        return drag;
+    }
+
+    public float getMomentNormalForce() {
+        return momentNormalForce;
+    }
+
+    public float getMomentDragContribution() {
+        return momentDrag;
     }
 
     public void reset() {
-        reactionForce.setZero();
-        moment = 0;
+        normalForce.setZero();
+        momentNormalForce = 0;
+        momentDrag = 0;
     }
 
     public void updateFrameDistanceAndPosition(float extensionFactor) {
@@ -93,8 +116,7 @@ public class Wheel {
         sprite.setRotation(aircraft.getPitchAngleInDegrees());
         sprite.setScale(1.0f, extensionFactor);
 
-        float distance = 1.07f + 0.68f * extensionFactor;
-        this.frameDistance = aircraft.getGear().getGearPosition() == GearPosition.DOWN ? 1.75f : distance;
+        this.frameDistance = 1.07f + 0.68f * extensionFactor;
     }
 
     public void render(SpriteBatch batch) {

@@ -325,16 +325,20 @@ public class FlightSimulation extends ApplicationAdapter implements InputProcess
         if (steeringMode == SteeringMode.AUTO_PILOT) {
             AutoPilot autoPilot = aircraft.getAutoPilot();
             if (pitchAngleDataUI.mouseAboveUI(xMouse, uiViewport.getWorldHeight() - yMouse)) {
+                autoPilot.reset();
                 autoPilot.setMode(AutoPilotMode.PITCH_HOLD);
                 autoPilot.changeSetPitchAngle(amountY);
             } else if (climbRateDataUI.mouseAboveUI(xMouse + climbRateDataUI.getRadius(),
                     uiViewport.getWorldHeight() - yMouse + climbRateDataUI.getRadius())) {
+                autoPilot.reset();
                 autoPilot.setMode(AutoPilotMode.VERTICAL_SPEED);
                 autoPilot.changeSetClimbRate(amountY, true);
             } else if (altitudeTape.mouseAboveUI(xMouse, yMouse)) {
+                autoPilot.reset();
                 autoPilot.changeSetAltitude(amountY, false);
                 autoPilot.setMode(AutoPilotMode.ALTITUDE_HOLD);
             } else if (autoPilotModeDataUI.mouseAboveUI(xMouse, uiViewport.getWorldHeight() - yMouse)) {
+                autoPilot.reset();
                 if (autoPilot.getMode() == AutoPilotMode.PITCH_HOLD){
                     autoPilot.changeSetPitchAngle(amountY);
                 } else {
