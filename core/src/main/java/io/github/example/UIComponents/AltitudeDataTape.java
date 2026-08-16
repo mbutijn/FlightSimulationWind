@@ -56,7 +56,7 @@ public class AltitudeDataTape extends DataTape {
         int currentValue = Math.round(value);
 
         //int offset = currentValue >= 10000 ? 35 : currentValue >= 1000 ? 25 : currentValue >= 100 ? 15 : currentValue >= 10 ? 5 : 0;
-        font.draw(batch, String.format("%7d", currentValue), x - 35, center + 7);
+        font.draw(batch, formatAltitude(value), x - 35, center + 7);
         for (int i = currentValue - bound; i <= currentValue + bound; i++) {
             if (i >= 0 && i % spacing == 0) {
                 float yPosition = (i - value) * pixelSpacing;
@@ -66,6 +66,10 @@ public class AltitudeDataTape extends DataTape {
                 font.draw(batch, Integer.toString(i), xBarRight + 5, reference + 5);
             }
         }
+    }
+
+    private String formatAltitude(float value) {
+        return Integer.toString(Math.round(value));
     }
 
 }

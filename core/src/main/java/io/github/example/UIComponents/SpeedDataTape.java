@@ -47,7 +47,8 @@ public class SpeedDataTape extends DataTape {
         float xBarEnd = x + 10;
         int currentValue = Math.round(value);
 
-        font.draw(batch, String.format("%7.1f", value), x + width, center + 7);
+        //font.draw(batch, String.format("%7.1f", value), x + width, center + 7);
+        font.draw(batch, formatVelocity(value), x + width, center + 7);
         for (int i = currentValue - bound; i <= currentValue + bound; i++) {
             if (i >= 0 && i % spacing == 0) {
                 float yPosition = (i - value) * pixelSpacing;
@@ -80,5 +81,10 @@ public class SpeedDataTape extends DataTape {
             }
             shape.rectLine(xPosition, under, xPosition, under + barHeigth * pixelSpacing, 2);
         }
+    }
+
+    private String formatVelocity(float value) {
+        int rounded = Math.round(value * 10f);
+        return (rounded / 10) + "." + Math.abs(rounded % 10);
     }
 }

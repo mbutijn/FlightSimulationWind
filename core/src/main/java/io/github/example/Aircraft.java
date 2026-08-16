@@ -158,7 +158,7 @@ public class Aircraft {
     public void reset() {
         System.out.println("reset");
 
-        this.position = new Vector2(0, UnitConversionUtils.convertFeet2M(50)); // 0, 2500 (service ceiling = 4267.2f)
+        this.position = new Vector2(0, UnitConversionUtils.convertFeet2M(2500)); // 0, 2500 (service ceiling = 4267.2f)
         this.velocity = new Vector2(55, 0); // 55, 0
         this.acceleration = new Vector2(0, 0);
         this.engine.reset();
