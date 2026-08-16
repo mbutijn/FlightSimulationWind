@@ -83,7 +83,7 @@ public class AutoPilot {
 
     public int calculateAutoThrottle() {
         float airspeed = wing.getTrueAirspeed();
-        float powerReq = (wing.getDrag() * airspeed + aircraft.getWeight() * airspeed * (float) Math.sin(wing.getFlightPathAngle()))
+        float powerReq = ((wing.getDrag() + aircraft.getGear().getDrag()) * airspeed + aircraft.getWeight() * airspeed * (float) Math.sin(wing.getFlightPathAngle()))
                 * aircraft.getAir().getInvertedDensityRatio();
 
         float power = powerReq + 10000 * (setAirspeed - airspeed);
@@ -146,6 +146,10 @@ public class AutoPilot {
 
     public float getSetAirspeed() {
         return setAirspeed;
+    }
+
+    public void setAutoThrottle(boolean autoThrottle) {
+        this.autoThrottle = autoThrottle;
     }
 
     public boolean getAutoThrottle() {

@@ -6,7 +6,10 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import io.github.example.Aircraft;
+import io.github.example.FlightSimulation;
 import io.github.example.GearPosition;
+import io.github.example.SteeringMode;
+import io.github.example.utils.Config;
 
 public class Wheel {
     private final Aircraft aircraft;
@@ -15,7 +18,8 @@ public class Wheel {
     private float momentNormalForce, momentDrag, previousDisplacement, frameDistance;
     private boolean onGround;
     private final Sprite sprite;
-    private final float radius = 0.325f;
+    private final float radius = Config.getFloat("aircraft1.wheelRadius");
+    private float dragAbsolute;
 
     public Wheel(Aircraft aircraft, float x, float y, float stiffness, float damping, float fuselageSectionDistance) {
         this.aircraft = aircraft;
@@ -57,6 +61,11 @@ public class Wheel {
             momentNormalForce = (position.x * normalForce.y) - (position.y * normalForce.x); // cross product
             onGround = true;
             previousDisplacement = displacement;
+
+            if (FlightSimulation.getSteeringMode() == SteeringMode.AUTO_PILOT) { // switch autopilot components off when wheel touches the ground
+                FlightSimulation.setSteeringMode(SteeringMode.NONE);
+                aircraft.getAutoPilot().setAutoThrottle(false);
+            }
         } else {
             normalForce.y = 0;
             onGround = false;
@@ -84,8 +93,9 @@ public class Wheel {
     public void updateDragAndMomentContribution(float pitchAngleRad) {
         float dragCoefficient = aircraft.getGear().getExtensionFactor() * 0.05f;
         float dynamicPressure = aircraft.getDynamicPressure();
-        drag.x = -dragCoefficient * dynamicPressure * (float) Math.cos(pitchAngleRad);
-        drag.y = -dragCoefficient * dynamicPressure * (float) Math.sin(pitchAngleRad);
+        dragAbsolute = dragCoefficient * dynamicPressure;
+        drag.x = -dragAbsolute * (float) Math.cos(pitchAngleRad);
+        drag.y = -dragAbsolute * (float) Math.sin(pitchAngleRad);
         momentDrag = (position.x * drag.y) - (position.y * drag.x); // cross product
     }
 
@@ -137,5 +147,9 @@ public class Wheel {
 
     public void renderFrame(ShapeRenderer shape) {
         shape.rectLine(startFrame.x, startFrame.y, sprite.getX() + radius, sprite.getY() + radius, 0.15f);
+    }
+
+    public float getDragAbsolute() {
+        return dragAbsolute;
     }
 }

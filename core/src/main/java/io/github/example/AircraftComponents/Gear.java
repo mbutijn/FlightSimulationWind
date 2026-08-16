@@ -133,4 +133,8 @@ public class Gear {
     public float getExtensionFactor() {
         return extensionFactor;
     }
+
+    public float getDrag() {
+        return frontWheel.getDragAbsolute() + rearWheel.getDragAbsolute();
+    }
 }

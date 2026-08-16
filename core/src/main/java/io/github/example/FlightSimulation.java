@@ -37,7 +37,7 @@ public class FlightSimulation extends ApplicationAdapter implements InputProcess
     private AngleOfAttackDataUI angleOfAttackDataUI;
     private ThrottleDataUI throttleDataUI;
     private ClimbRateDataUI climbRateDataUI;
-    private SteeringModeDataUI steeringModeDataUI;
+    private static SteeringModeDataUI steeringModeDataUI;
     private AutoPilotModeDataUI autoPilotModeDataUI;
 
     public FlightSimulation(){
@@ -367,6 +367,11 @@ public class FlightSimulation extends ApplicationAdapter implements InputProcess
         worldCamera.zoom = Math.max(0.01f, Math.min(worldCamera.zoom, 10.0f)); // Clamp the zoom level
     }
 
+    public static void setSteeringMode(SteeringMode mode) {
+        steeringMode = mode;
+        steeringModeDataUI.reset();
+    }
+
     @Override
     public void resize(int width, int height) {
         worldViewport.update(width, height);
@@ -377,7 +382,6 @@ public class FlightSimulation extends ApplicationAdapter implements InputProcess
     public boolean touchCancelled(int screenX, int screenY, int pointer, int button) {
         return false;
     }
-
 
     public static SteeringMode getSteeringMode() {
         return steeringMode;
